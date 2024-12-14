@@ -166,3 +166,38 @@ For questions or feedback, please reach out to:
 - **Anjali Kalwar**  
 - **Prinkal Dhingra**
 -  **Vansh Dhawan**
+
+# Contribution Guidelines
+
+## Claim an Issue
+- Comment on the issue to claim it.
+- In case of no activity on the issue even after 2 days, the issue will be reassigned.
+- If you have difficulty approaching the issue, feel free to ask on our Discord channel.
+
+## Communication
+- Whether you are working on a new feature or facing a doubt, please feel free to ask us on our Discord channel.
+- We will be happy to help you out.
+
+## Guidelines
+### General
+- Please help us follow best practices to make it easy for the reviewer as well as the contributor.
+- We want to focus on code quality more than on managing pull request (PR) ethics.
+
+### People Before Code
+- If any of the following rules are violated, the pull requests must not be rejected. This is to create an easy and joyful onboarding process for new programmers and first-time contributors.
+
+### Pull Request (PR) Guidelines
+1. **Single Commit per PR**: Ensure there is a single commit per pull request and name the commit meaningfully. For example: `Adding <your-name> in students/mentors section`.
+2. **Reference Issues**: Reference the issue numbers in the commit message if it resolves an open issue. Follow the PR template:
+   ```
+   Issue: <ISSUE NUMBER>
+   ```
+3. **Live Preview or Screenshots**: Provide a link to the live GitHub Pages from your forked repository or relevant screenshots for easier review.
+4. **Inactive PRs**: Pull requests older than 3 days with no response from the contributor shall be marked closed.
+5. **Issue-Linked PRs Only**: Do not make a PR that is not related to any issue. You can create an issue and solve it once approved.
+6. **Avoid Duplicate PRs**: If necessary, comment on the older PR with the PR number of the follow-up (new PR) and close the obsolete PR yourself.
+7. **Be Polite**: Be polite and respectful to other community members.
+---
+
+Thank you for contributing! We look forward to working with you and making this project a success.
+
