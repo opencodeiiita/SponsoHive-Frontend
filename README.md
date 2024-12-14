@@ -147,7 +147,7 @@ my-react-app
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the OpenCode.
 
 ---
 
@@ -164,4 +164,5 @@ Contributions are welcome! Please follow these steps:
 ## Contact
 For questions or feedback, please reach out to:
 - **Anjali Kalwar**  
-  Email: your-email@example.com
+- **Prinkal Dhingra**
+-  **Vansh Dhawan**
