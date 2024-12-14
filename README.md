@@ -163,9 +163,9 @@ Contributions are welcome! Please follow these steps:
 
 ## Contact
 For questions or feedback, please reach out to:
-- **Anjali Kalwar**  
 - **Prinkal Dhingra**
 -  **Vansh Dhawan**
+- **Anjali Kalwar**  
 
 # Contribution Guidelines
 
