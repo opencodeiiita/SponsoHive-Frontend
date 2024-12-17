@@ -12,22 +12,20 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-
     "@material/card": "^14.0.0",
     "@mui/icons-material": "^6.2.0",
     "@mui/material": "^6.2.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "antd": "^5.22.5",
     "axios": "^1.7.9",
     "chart.js": "^4.4.7",
     "express": "^4.21.2",
-
-    "antd": "^5.22.5",
-
     "gsap": "^3.12.5",
     "my-react-app": "file:",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
+    "react-icons": "^5.4.0",
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.0.2"
   },
