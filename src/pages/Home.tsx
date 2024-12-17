@@ -79,12 +79,15 @@ const Home: React.FC = () => {
         </div>
 
         <div className="md:w-1/2 flex justify-center">
-          <img
-            src="/src/assets/main-image.jpg"
-            alt="Sponsorship Tools"
-            className="w-full md:w-4/5 rounded-lg shadow-lg"
-          />
-        </div>
+  <div className="w-full md:w-4/5 aspect-w-16 aspect-h-9">
+    <img
+      src="/src/assets/main-image.jpg"
+      alt="Sponsorship Tools"
+      className="object-cover rounded-lg shadow-lg transform hover:scale-105 transition-transform duration-300 ease-in-out"
+    />
+  </div>
+</div>
+
       </div>
 
       <div
