@@ -5,7 +5,7 @@ import { Button, Box } from "@mui/material";
 import BGimg from "../assets/cardBG.jpg";
 import Nav_Img from "../assets/main-image.jpg";
 
-const { Header, Content, Footer } = Layout;
+const { Content, Footer } = Layout;
 
 const coreFeatures = [
   {
