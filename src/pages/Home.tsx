@@ -1,4 +1,5 @@
 import React from "react";
+import { LoginButton } from "../components/LoginButton";
 import { Layout, Row, Col, Card } from "antd";
 import { Button, Box } from "@mui/material";
 import BGimg from "../assets/cardBG.jpg";
