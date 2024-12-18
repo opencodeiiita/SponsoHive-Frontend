@@ -39,7 +39,7 @@ const Footer: React.FC = () => {
           {/* Quick Links */}
           <div className="space-y-4 text-center">
             <h5 className="text-xl font-bold text-purple-400 mb-2">Quick Links</h5>
-            <div className="grid grid-cols-2 gap-y-4"> {/* Adjusted gap for better spacing */}
+            <div className="grid grid-cols-2 gap-y-4"> 
               <a
                 href="/about"
                 className="text-gray-300 hover:text-purple-400 transition-transform transform hover:scale-105"
