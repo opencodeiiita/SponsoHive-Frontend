@@ -3,9 +3,11 @@ import { Layout, Row, Col, Card } from "antd";
 import { Button, Box } from "@mui/material";
 import BGimg from "../assets/cardBG.jpg";
 import Nav_Img from "../assets/main-image.jpg";
-import Navbar from "../components/Navbar"; // Import the Navbar
+import Navbar from "../components/Navbar"; 
+import Footer from "../components/Footer";
 
-const { Content, Footer } = Layout;
+
+const { Content } = Layout;
 
 const coreFeatures = [
   {
@@ -191,10 +193,7 @@ const Home: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <Footer className="text-center text-yellow-500 bg-black">
-          &copy; {new Date().getFullYear()} Sponsorship Platform. All rights
-          reserved.
-        </Footer>
+        <Footer />
       </Layout>
     </div>
   );
