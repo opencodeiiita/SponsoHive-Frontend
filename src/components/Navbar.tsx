@@ -7,8 +7,14 @@ const Navbar: React.FC = () => {
   return (
     <AppBar
       position="sticky"
-      style={{ backgroundColor: "black", color: "#FACC15" }} // MaterialUI styling
-      className="shadow-lg" // Tailwind utility for shadow
+      style={{
+        backgroundColor: "black",
+        color: "#FACC15",
+        width: "100%", // Ensures full width
+        margin: 0,
+        boxSizing: "border-box",
+      }}
+      className="shadow-lg"
     >
       <Toolbar className="flex justify-between items-center px-6 md:px-16">
         {/* Left Section */}
