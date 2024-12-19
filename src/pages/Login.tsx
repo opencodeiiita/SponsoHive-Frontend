@@ -37,7 +37,7 @@ const LoginPage = () => {
       return;
     }
 
-    navigate("/");
+    navigate("/home");
   };
 
   return (
@@ -178,6 +178,17 @@ const LoginPage = () => {
                 />
               );
             })}
+          </div>
+          <div className="mt-6">
+            <Typography.Text>
+              Do not have an account?{" "}
+              <a
+                onClick={() => navigate("/signup")}
+                className="text-yellow-500 cursor-pointer hover:text-yellow-700"
+              >
+                Sign Up
+              </a>
+            </Typography.Text>
           </div>
         </div>
       </div>

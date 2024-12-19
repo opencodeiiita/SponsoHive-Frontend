@@ -4,6 +4,7 @@ import { TextField } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import HttpsOutlinedIcon from "@mui/icons-material/HttpsOutlined";
 import VpnKeyOutlinedIcon from "@mui/icons-material/VpnKeyOutlined";
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { FaFacebookF, FaGoogle, FaInstagram } from "react-icons/fa";
 import SignupImage from "../assets/Login.svg";
 
@@ -13,6 +14,7 @@ const SignupPage = () => {
   const [focusedField, setFocusedField] = useState("");
   const [credentials, setCredentials] = useState({
     username: "",
+    email: "",
     password: "",
     confirmPassword: "",
   });
@@ -23,12 +25,10 @@ const SignupPage = () => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSignup = () => {
+    const { username, email, password, confirmPassword } = credentials;
 
-    const { username, password, confirmPassword } = credentials;
-
-    if (!username || !password || !confirmPassword) {
+    if (!username || !email || !password || !confirmPassword) {
       return message.error("All fields are required!");
     }
 
@@ -44,13 +44,13 @@ const SignupPage = () => {
     }
 
     // Save new user
-    users.push({ username, password });
+    users.push({ username, email, password });
     localStorage.setItem("users", JSON.stringify(users));
-    message.success("Sign-Up Successful! Redirecting to Home Page...");
+    message.success("Sign-Up Successful! Redirecting to Login Page...");
 
-    // Mock Redirect to Home Page
+    // Redirect to Login Page
     setTimeout(() => {
-      window.location.href = "/home";
+      window.location.href = "/login";
     }, 1500);
   };
 
@@ -73,7 +73,7 @@ const SignupPage = () => {
             Create an Account
           </Typography.Title>
         </div>
-        <Form className="w-full max-w-md mx-auto" onSubmit={handleSubmit}>
+        <Form className="w-full max-w-md mx-auto">
           <Form.Item>
             <div className="flex items-center border-b-2 pb-1">
               <AccountCircleOutlinedIcon
@@ -91,6 +91,38 @@ const SignupPage = () => {
                 label="Username"
                 variant="standard"
                 onFocus={() => handleFocus("username")}
+                onBlur={handleBlur}
+                onChange={handleChange}
+                InputProps={{ disableUnderline: true }}
+                sx={{
+                  "& .MuiInputLabel-root": { color: "gray" },
+                  "& .MuiInputLabel-root.Mui-focused": { color: "#F59E0B" },
+                  "& .MuiInput-underline:before": { borderBottom: "2px solid black" },
+                  "& .MuiInput-underline:hover:before": {
+                    borderBottom: "2px solid #F59E0B !important",
+                  },
+                  "& .MuiInput-underline:after": { borderBottom: "2px solid #F59E0B" },
+                }}
+              />
+            </div>
+          </Form.Item>
+          <Form.Item>
+            <div className="flex items-center border-b-2 pb-1">
+              <EmailOutlinedIcon
+                style={{
+                  color: focusedField === "email" ? "#F59E0B" : "black",
+                  fontSize: "2rem",
+                  marginRight: "0.5rem",
+                  transition: "color 0.3s",
+                  marginTop: "1rem",
+                }}
+              />
+              <TextField
+                fullWidth
+                name="email"
+                label="Email"
+                variant="standard"
+                onFocus={() => handleFocus("email")}
                 onBlur={handleBlur}
                 onChange={handleChange}
                 InputProps={{ disableUnderline: true }}
@@ -179,7 +211,6 @@ const SignupPage = () => {
           </div>
           <Button
             type="primary"
-            htmlType="submit"
             className="w-full flex items-center justify-center rounded-lg text-lg"
             style={{
               backgroundColor: "#F59E0B",
@@ -188,6 +219,7 @@ const SignupPage = () => {
               height: "55px",
               fontSize: "1.1rem",
             }}
+            onClick={handleSignup}
           >
             Sign Up
           </Button>
