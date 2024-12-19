@@ -1,8 +1,8 @@
 import React from 'react';
-import { Button, Input, Table, DatePicker, Form, Modal } from 'antd';
+import { Button, Input, Table, DatePicker, TimePicker, Form, Modal, Card, Statistic, Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import '../styles/EmailAutomation.css'; // Assuming this contains Tailwind setup.
-
+import { emailCampaignData, campaignSummary } from '../utils/dummyEmailData'; // Import dummy data
+import '../styles/EmailAutomation.css'; 
 const { RangePicker } = DatePicker;
 
 const CampaignAutomation = () => {
@@ -14,35 +14,45 @@ const CampaignAutomation = () => {
 
   const columns = [
     {
-      title: 'Template Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'Campaign Name',
+      dataIndex: 'campaignName',
+      key: 'campaignName',
     },
     {
-      title: 'Date Created',
-      dataIndex: 'created',
-      key: 'created',
+      title: 'Emails Sent',
+      dataIndex: 'sent',
+      key: 'sent',
     },
     {
-      title: 'Actions',
-      key: 'actions',
-      render: (_, record) => (
-        <Button type="link" danger onClick={() => deleteTemplate(record.key)}>
-          Delete
-        </Button>
-      ),
+      title: 'Emails Opened',
+      dataIndex: 'opened',
+      key: 'opened',
+    },
+    {
+      title: 'Emails Clicked',
+      dataIndex: 'clicked',
+      key: 'clicked',
+    },
+    {
+      title: 'Non-Responders',
+      dataIndex: 'nonResponders',
+      key: 'nonResponders',
     },
   ];
 
-  const deleteTemplate = (key) => {
+  const deleteTemplate = (key: string) => {
     setTemplates((prev) => prev.filter((item) => item.key !== key));
   };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const onFinish = (values) => {
-    console.log('Form Values:', values);
+  const onFinish = (values: any) => {
+    console.log('Scheduled Values:', {
+      dateRange: values.dateRange,
+      time: values.time ? values.time.format('HH:mm') : null, // Convert time to 24-hour format
+      followUp: values.followUp,
+    });
     setIsModalOpen(false);
   };
 
@@ -55,6 +65,40 @@ const CampaignAutomation = () => {
           Streamline your email campaigns with custom templates and scheduling.
         </p>
       </header>
+
+      {/* Campaign Dashboard Section */}
+      <section className="dashboard bg-gray-900 p-6 rounded-lg shadow-lg mb-8">
+        <h2 className="text-2xl font-semibold mb-4">Campaign Dashboard</h2>
+        <Row gutter={[16, 16]} className="mb-6">
+          <Col span={6}>
+            <Card>
+              <Statistic title="Total Emails Sent" value={campaignSummary.totalSent} />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card>
+              <Statistic title="Total Emails Opened" value={campaignSummary.totalOpened} />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card>
+              <Statistic title="Total Emails Clicked" value={campaignSummary.totalClicked} />
+            </Card>
+          </Col>
+          <Col span={6}>
+            <Card>
+              <Statistic title="Total Non-Responders" value={campaignSummary.totalNonResponders} />
+            </Card>
+          </Col>
+        </Row>
+
+        <Table
+          columns={columns}
+          dataSource={emailCampaignData}
+          pagination={false}
+          className="bg-gray-800 text-yellow-300 rounded-lg"
+        />
+      </section>
 
       {/* Main Content */}
       <main className="content space-y-8">
@@ -91,6 +135,18 @@ const CampaignAutomation = () => {
               rules={[{ required: true, message: 'Please select a date range!' }]}
             >
               <RangePicker className="w-full bg-gray-800 text-yellow-400 border-yellow-500" />
+            </Form.Item>
+
+            <Form.Item
+              label={<span className="text-yellow-400">Select Time</span>}
+              name="time"
+              rules={[{ required: true, message: 'Please select a time!' }]}
+            >
+              <TimePicker
+                use12Hours
+                format="h:mm a"
+                className="w-full bg-gray-800 text-yellow-400 border-yellow-500"
+              />
             </Form.Item>
 
             <Form.Item
