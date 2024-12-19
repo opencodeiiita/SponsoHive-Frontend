@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Typography, Form } from "antd";
+import { Button, Typography, Form, message } from "antd";
 import { TextField } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import HttpsOutlinedIcon from "@mui/icons-material/HttpsOutlined";
@@ -11,9 +11,48 @@ import "tailwindcss/tailwind.css";
 
 const SignupPage = () => {
   const [focusedField, setFocusedField] = useState("");
+  const [credentials, setCredentials] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
 
   const handleFocus = (field) => setFocusedField(field);
   const handleBlur = () => setFocusedField("");
+  const handleChange = (e) => {
+    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const { username, password, confirmPassword } = credentials;
+
+    if (!username || !password || !confirmPassword) {
+      return message.error("All fields are required!");
+    }
+
+    if (password !== confirmPassword) {
+      return message.error("Passwords do not match!");
+    }
+
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const userExists = users.find((user) => user.username === username);
+
+    if (userExists) {
+      return message.error("Username already exists!");
+    }
+
+    // Save new user
+    users.push({ username, password });
+    localStorage.setItem("users", JSON.stringify(users));
+    message.success("Sign-Up Successful! Redirecting to Home Page...");
+
+    // Mock Redirect to Home Page
+    setTimeout(() => {
+      window.location.href = "/home";
+    }, 1500);
+  };
 
   return (
     <div className="flex flex-col-reverse lg:flex-row min-h-screen items-center justify-center bg-white px-4 sm:px-8 md:px-16">
@@ -34,7 +73,7 @@ const SignupPage = () => {
             Create an Account
           </Typography.Title>
         </div>
-        <Form className="w-full max-w-md mx-auto">
+        <Form className="w-full max-w-md mx-auto" onSubmit={handleSubmit}>
           <Form.Item>
             <div className="flex items-center border-b-2 pb-1">
               <AccountCircleOutlinedIcon
@@ -48,10 +87,12 @@ const SignupPage = () => {
               />
               <TextField
                 fullWidth
+                name="username"
                 label="Username"
                 variant="standard"
                 onFocus={() => handleFocus("username")}
                 onBlur={handleBlur}
+                onChange={handleChange}
                 InputProps={{ disableUnderline: true }}
                 sx={{
                   "& .MuiInputLabel-root": { color: "gray" },
@@ -78,11 +119,13 @@ const SignupPage = () => {
               />
               <TextField
                 fullWidth
+                name="password"
                 label="Password"
                 type="password"
                 variant="standard"
                 onFocus={() => handleFocus("password")}
                 onBlur={handleBlur}
+                onChange={handleChange}
                 InputProps={{ disableUnderline: true }}
                 sx={{
                   "& .MuiInputLabel-root": { color: "gray" },
@@ -109,11 +152,13 @@ const SignupPage = () => {
               />
               <TextField
                 fullWidth
+                name="confirmPassword"
                 label="Confirm Password"
                 type="password"
                 variant="standard"
                 onFocus={() => handleFocus("confirmPassword")}
                 onBlur={handleBlur}
+                onChange={handleChange}
                 InputProps={{ disableUnderline: true }}
                 sx={{
                   "& .MuiInputLabel-root": { color: "gray" },
@@ -128,7 +173,7 @@ const SignupPage = () => {
             </div>
           </Form.Item>
           <div className="flex justify-end text-sm mb-4">
-            <a href="#" className="text-black hover:text-yellow-400">
+            <a href="/login" className="text-black hover:text-yellow-400">
               Already have an account? Login
             </a>
           </div>
