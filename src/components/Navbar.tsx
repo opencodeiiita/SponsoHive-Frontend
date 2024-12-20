@@ -70,7 +70,17 @@ const Navbar: React.FC = () => {
   return (
     <AppBar
       position="sticky"
+
       style={{ backgroundColor: "black", color: "#FACC15" }}
+
+      style={{
+        backgroundColor: "black",
+        color: "#FACC15",
+        width: "100%", // Ensures full width
+        margin: 0,
+        boxSizing: "border-box",
+      }}
+
       className="shadow-lg"
     >
       <Toolbar className="flex justify-between items-center px-4 md:px-16">
