@@ -10,6 +10,7 @@ import CampaignAutomation from "./pages/CampaignAutomation";
 import LoginPage from "./pages/Login";
 import SignPage from "./pages/Signup";
 import TemplateInsights from "./pages/TemplatesInsights";
+import BulkUpload from "./pages/BulkUpload";
 
 const App = () => {
   return (
@@ -23,6 +24,7 @@ const App = () => {
         <Route path="/template-insights" element={<TemplateInsights />} />
         <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
         <Route path="/dashboard/campaign" element={<CampaignAutomation />} />
+        <Route path="/dashboard/addfile" element={<BulkUpload/>} />
       </Routes>
     </Router>
   );
