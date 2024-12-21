@@ -17,7 +17,7 @@ import {
 import { MenuOutlined, UserOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-import Logo from "../assets/LogoSite.png";
+import Logo from "../assets/logo.png";
 
 const Navbar: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -88,7 +88,7 @@ const Navbar: React.FC = () => {
           <img
             src={Logo}
             alt="Logo"
-            style={{ height: "40px" }}
+            style={{ height: "60px" }}
             className="hidden md:block"
           />
           <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-600 via-yellow-500 to-yellow-400">
@@ -99,17 +99,17 @@ const Navbar: React.FC = () => {
         {/* Right Section */}
         <Box className="hidden md:flex space-x-4 items-center">
           <Link to="/">
-            <Button
-              className="text-yellow-300 hover:text-yellow-500"
-              variant="text"
+            <h1
+              className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-300"
+
             >
               Home
-            </Button>
+            </h1>
           </Link>
           <IconButton
             color="inherit"
             aria-label="user-profile"
-            className="text-yellow-500 hover:text-yellow-300"
+            className="bg-clip-text bg-gradient-to-r from-yellow-500 via-yellow-400 to-yellow-300 hover:text-yellow-300"
             onClick={handleMenuClick}
           >
             <UserOutlined className="text-2xl" />
@@ -118,8 +118,8 @@ const Navbar: React.FC = () => {
             anchorEl={anchorEl}
             open={open}
             onClose={handleMenuClose}
-            anchorOrigin={{ vertical: "top", horizontal: "right" }}
-            transformOrigin={{ vertical: "top", horizontal: "right" }}
+            anchorOrigin={{ vertical: "bottom", horizontal: "right" }} 
+            transformOrigin={{ vertical: "top", horizontal: "right" }} 
           >
             <MenuItem component={Link} to="/login" onClick={handleMenuClose}>
               Login
