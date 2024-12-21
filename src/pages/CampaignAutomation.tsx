@@ -247,7 +247,6 @@ const CampaignAutomation: React.FC = () => {
 
       <Modal
         title="Create Email Template"
-        title="Create Email Template"
         visible={isModalOpen}
         onCancel={closeModal}
         footer={null}

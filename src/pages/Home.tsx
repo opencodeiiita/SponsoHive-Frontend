@@ -6,6 +6,7 @@ import BGimg from "../assets/cardBG.jpg";
 import Nav_Img from "../assets/main-image.jpg";
 import Navbar from "../components/Navbar"; 
 import Footer from "../components/Footer";
+import { motion } from 'framer-motion';
 
 
 const { Content } = Layout;
@@ -13,100 +14,44 @@ const { Content } = Layout;
 const coreFeatures = [
   {
     title: "Email List Management",
-    description:
-      "Upload email lists in bulk via CSV/Excel. Organize and categorize contacts. Detect duplicates and invalid emails.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Email Management"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
+    description: "Upload email lists in bulk via CSV/Excel. Organize and categorize contacts. Detect duplicates and invalid emails.",
+    icon: "📧"
   },
   {
     title: "Email Campaign Automation",
-    description:
-      "Create custom email templates. Schedule automated email dispatch and set follow-up sequences for non-responders.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Email Automation"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
+    description: "Create custom email templates. Schedule automated email dispatch and set follow-up sequences for non-responders.",
+    icon: "⚙️"
   },
   {
     title: "Personalization",
-    description:
-      "Use placeholders for personalized content. Add attachments like sponsorship proposals or brochures.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Personalization"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
+    description: "Use placeholders for personalized content. Add attachments like sponsorship proposals or brochures.",
+    icon: "👤"
   },
   {
     title: "Performance Analytics",
-    description:
-      "Track open rates, click-through rates, and response rates. Monitor bounce rates and manage unsubscribes.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Analytics"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
+    description: "Track open rates, click-through rates, and response rates. Monitor bounce rates and manage unsubscribes.",
+    icon: "📊"
   },
   {
     title: "Integration Capabilities",
-    description:
-      "Connect with CRMs like HubSpot or Salesforce. Integrate with social media for enhanced contact research.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Integration"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
+    description: "Connect with CRMs like HubSpot or Salesforce. Integrate with social media for enhanced contact research.",
+    icon: "🔄"
   },
   {
     title: "Compliance",
-    description:
-      "GDPR and CAN-SPAM compliant features. Ensure opt-out options and sender verification.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Compliance"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
+    description: "GDPR and CAN-SPAM compliant features. Ensure opt-out options and sender verification.",
+    icon: "🛡️"
   },
   {
     title: "Collaboration Tools",
-    description:
-      "Multi-user access for teams. Assign tasks and follow up on specific contacts.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Collaboration"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
+    description: "Multi-user access for teams. Assign tasks and follow up on specific contacts.",
+    icon: "👥"
   },
   {
     title: "Templates & Insights",
-    description:
-      "Pre-designed templates for sponsorship requests. Insights on email timing and outreach improvement.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Templates"
-        style={{ width: "80px", height: "50px" }}
-      />
-    ),
-  },
+    description: "Pre-designed templates for sponsorship requests. Insights on email timing and outreach improvement.",
+    icon: "📝"
+  }
 ];
 
 const Home: React.FC = () => {
@@ -158,40 +103,59 @@ const Home: React.FC = () => {
         </div>
 
         {/* Core Features Section */}
-        <div className="bg-black bg-opacity-0 text-black py-12">
-          <h2 className="text-3xl font-bold text-center mb-6">Core Features</h2>
-          <Content className="p-8">
-            <Row gutter={[16, 16]} justify="center">
-              {coreFeatures.map((feature, index) => (
-                <Col xs={24} sm={12} md={8} lg={6} key={index}>
-                  <Card
-                    hoverable
-                    style={{
-                      height: "320px",
-                      width: "320px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                    }}
-                    className="bg-black text-yellow-300 text-center border-2 border-yellow-500 shadow-lg"
+        <div className="w-full bg-gradient-to-b from-yellow-400 to-yellow-300 py-16 px-4">
+      <div className="max-w-7xl mx-auto">
+        <h2 className="text-4xl font-bold text-center text-black mb-16 relative">
+          CORE  FEATURES
+          <div className="absolute w-24 h-1 mt-4"></div>
+        </h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {coreFeatures.map((feature, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              whileHover={{ scale: 1.03 }}
+              className="group"
+            >
+              <div className="h-full bg-black rounded-xl p-6 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col">
+                <div className="mb-6 flex items-center">
+                  <div className="w-14 h-14 bg-gradient-to-br from-red-600 to-red-600 rounded-2xl flex items-center justify-center text-3xl transform -rotate-6 group-hover:rotate-0 transition-all duration-300 shadow-lg">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-xl font-bold text-yellow-400 ml-4">
+                    {feature.title}
+                  </h3>
+                </div>
+                
+                <p className="text-yellow-100 text-sm leading-relaxed flex-grow mb-6">
+                  {feature.description}
+                </p>
+                
+                <button className="w-full bg-white text-black font-semibold py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors duration-300 flex items-center justify-center group mt-auto">
+                  <span>Learn More</span>
+                  <svg 
+                    className="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform duration-200"
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
                   >
-                    <Box className="flex justify-center mb-4">
-                      {feature.icon}
-                    </Box>
-                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-sm mb-4">{feature.description}</p>
-                    <Button
-                      variant="contained"
-                      style={{ backgroundColor: "#FACC15", color: "black" }}
-                    >
-                      Learn More
-                    </Button>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </Content>
+                    <path 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      strokeWidth={2} 
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </motion.div>
+          ))}
         </div>
+      </div>
+    </div>
 
         {/* Footer */}
         <Footer />
