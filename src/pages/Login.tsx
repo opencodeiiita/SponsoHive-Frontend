@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button, Typography, Form } from "antd";
 import { TextField } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
@@ -10,9 +11,34 @@ import "tailwindcss/tailwind.css";
 
 const LoginPage = () => {
   const [focusedField, setFocusedField] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleFocus = (field) => setFocusedField(field);
   const handleBlur = () => setFocusedField("");
+
+  const handleSignIn = () => {
+    setError("");
+
+    if (!email || !password) {
+      setError("Both email and password are required.");
+      return;
+    }
+
+    const users = JSON.parse(localStorage.getItem("users") || "[]");
+    const user = users.find(
+      (user) => user.email === email && user.password === password
+    );
+
+    if (!user) {
+      setError("Invalid email or password.");
+      return;
+    }
+
+    navigate("/home");
+  };
 
   return (
     <div className="flex flex-col-reverse lg:flex-row min-h-screen items-center justify-center bg-white px-4 sm:px-8 md:px-16">
@@ -34,11 +60,12 @@ const LoginPage = () => {
           </Typography.Title>
         </div>
         <Form className="w-full max-w-md mx-auto">
+          {error && <p className="text-red-500 mb-4">{error}</p>}
           <Form.Item>
             <div className="flex items-center border-b-2 pb-1">
               <AccountCircleOutlinedIcon
                 style={{
-                  color: focusedField === "username" ? "#F59E0B" : "black",
+                  color: focusedField === "email" ? "#F59E0B" : "black",
                   fontSize: "2rem",
                   marginRight: "0.5rem",
                   transition: "color 0.3s",
@@ -47,9 +74,11 @@ const LoginPage = () => {
               />
               <TextField
                 fullWidth
-                label="Username"
+                label="Email"
                 variant="standard"
-                onFocus={() => handleFocus("username")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onFocus={() => handleFocus("email")}
                 onBlur={handleBlur}
                 InputProps={{ disableUnderline: true }}
                 sx={{
@@ -80,6 +109,8 @@ const LoginPage = () => {
                 label="Password"
                 type="password"
                 variant="standard"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 onFocus={() => handleFocus("password")}
                 onBlur={handleBlur}
                 InputProps={{ disableUnderline: true }}
@@ -102,7 +133,7 @@ const LoginPage = () => {
           </div>
           <Button
             type="primary"
-            htmlType="submit"
+            onClick={handleSignIn}
             className="w-full flex items-center justify-center rounded-lg text-lg"
             style={{
               backgroundColor: "#F59E0B",
@@ -147,6 +178,17 @@ const LoginPage = () => {
                 />
               );
             })}
+          </div>
+          <div className="mt-6">
+            <Typography.Text>
+              Do not have an account?{" "}
+              <a
+                onClick={() => navigate("/signup")}
+                className="text-yellow-500 cursor-pointer hover:text-yellow-700"
+              >
+                Sign Up
+              </a>
+            </Typography.Text>
           </div>
         </div>
       </div>
