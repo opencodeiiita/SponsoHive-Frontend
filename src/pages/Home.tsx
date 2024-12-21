@@ -2,11 +2,11 @@ import React from "react";
 import { LoginButton } from "../components/LoginButton";
 import { Layout, Row, Col, Card } from "antd";
 import { Button, Box } from "@mui/material";
+import { Link } from "react-router-dom"; // Import Link
 import BGimg from "../assets/cardBG.jpg";
 import Nav_Img from "../assets/main-image.jpg";
-import Navbar from "../components/Navbar"; 
+import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
 
 const { Content } = Layout;
 
@@ -180,12 +180,32 @@ const Home: React.FC = () => {
                     </Box>
                     <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
                     <p className="text-sm mb-4">{feature.description}</p>
-                    <Button
-                      variant="contained"
-                      style={{ backgroundColor: "#FACC15", color: "black" }}
-                    >
-                      Learn More
-                    </Button>
+                    {feature.title === "Email Campaign Automation" ? (
+                      <Link to="/dashboard/campaign" style={{ textDecoration: "none" }}>
+                        <Button
+                          variant="contained"
+                          style={{ backgroundColor: "#FACC15", color: "black" }}
+                        >
+                          Learn More
+                        </Button>
+                      </Link>
+                    ) : feature.title === "Performance Analytics" ? (
+                      <Link to="/dashboard/analytics" style={{ textDecoration: "none" }}>
+                        <Button
+                          variant="contained"
+                          style={{ backgroundColor: "#FACC15", color: "black" }}
+                        >
+                          Learn More
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Button
+                        variant="contained"
+                        style={{ backgroundColor: "#FACC15", color: "black" }}
+                      >
+                        Learn More
+                      </Button>
+                    )}
                   </Card>
                 </Col>
               ))}
