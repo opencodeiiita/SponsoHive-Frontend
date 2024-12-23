@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 
 import AnalyticsPage from "./pages/AnalyticsDashboard";
 import './styles/global.css';
-
+import EmailListManager from "./pages/EmailListManager";
 import CampaignAutomation from "./pages/CampaignAutomation";
 import LoginPage from "./pages/Login";
 import SignPage from "./pages/Signup";
@@ -25,6 +25,7 @@ const App = () => {
         <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
         <Route path="/dashboard/campaign" element={<CampaignAutomation />} />
         <Route path="/dashboard/addfile" element={<BulkUpload/>} />
+        <Route path="/dashboard/emails" element={<EmailListManager/>} />
       </Routes>
     </Router>
   );

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, Input, Table, DatePicker, TimePicker, Form, Modal, Card, Statistic, Row, Col } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import { emailCampaignData, campaignSummary } from '../utils/dummyEmailData';
+import { emailCampaignData, campaignSummary, dummyEmailData } from '../utils/dummyEmailData';
 import '../styles/EmailAutomation.css';
 
 const { RangePicker } = DatePicker;
@@ -247,7 +247,7 @@ const CampaignAutomation: React.FC = () => {
 
       <Modal
         title="Create Email Template"
-        title="Create Email Template"
+        
         visible={isModalOpen}
         onCancel={closeModal}
         footer={null}
