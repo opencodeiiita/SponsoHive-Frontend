@@ -1,26 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Row,
-  Col,
-  Card,
-  Select,
-  Statistic,
-  Button,
-  Switch,
-  Tooltip,
-} from 'antd';
-
+import { Row, Col, Card, Select, Button, Switch, DatePicker } from 'antd';
 import { Line, Bar, Pie } from 'react-chartjs-2';
 import { ClipLoader } from 'react-spinners';
-import { DatePicker } from 'antd';
-const { RangePicker } = DatePicker;
 import { saveAs } from 'file-saver';
 import { json2csv } from 'json-2-csv';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip as ChartTooltip, Legend } from 'chart.js';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, BarElement, ArcElement, Tooltip, Legend } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import moment from 'moment';
-import Navbar from '../components/Navbar'
-import Footer from '../components/Footer'
+import Navbar from '../components/Navbar';
+import Footer from '../components/Footer';
+import { dummyCampaigns, generateRealTimeData } from '../utils/dummyData';
+
+const { RangePicker } = DatePicker;
+const { Option } = Select;
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -28,14 +21,10 @@ ChartJS.register(
   LineElement,
   BarElement,
   ArcElement,
-  ChartTooltip,
+  Tooltip,
   Legend,
   annotationPlugin
 );
-
-import { dummyCampaigns, generateRealTimeData } from '../utils/dummyData';
-
-const { Option } = Select;
 
 interface Campaign {
   id: string;
@@ -46,14 +35,11 @@ interface Campaign {
     responseRate: number;
     bounces: number;
     unsubscribes: number;
-    bounceRate?: number;
   };
   dailyEngagement: {
     date: string;
     openRate: number;
     clickThroughRate: number;
-    responseRate?: number;
-    bounceRate?: number;
   }[];
 }
 
@@ -64,32 +50,37 @@ const AnalyticsDashboard: React.FC = () => {
   const [dateRange, setDateRange] = useState<[moment.Moment, moment.Moment] | null>(null);
   const [metricType, setMetricType] = useState('Open Rate');
 
-  const exportToCSV = async () => {
-    const csvData = await json2csv(campaigns);
-    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, 'analytics-data.csv');
-  };
-
   useEffect(() => {
     setCampaigns(dummyCampaigns);
     setSelectedCampaignId(dummyCampaigns[0]?.id || null);
   }, []);
 
   useEffect(() => {
+    if (!selectedCampaignId) return;
+
     const interval = setInterval(() => {
-      if (selectedCampaignId) {
-        const updatedMetrics = generateRealTimeData(selectedCampaignId);
-        setCampaigns((prev) =>
-          prev.map((campaign) =>
-            campaign.id === selectedCampaignId
-              ? { ...campaign, metrics: updatedMetrics }
-              : campaign
-          )
-        );
-      }
+      const updatedMetrics = generateRealTimeData(selectedCampaignId);
+      setCampaigns((prev) =>
+        prev.map((campaign) =>
+          campaign.id === selectedCampaignId
+            ? { ...campaign, metrics: updatedMetrics }
+            : campaign
+        )
+      );
     }, 5000);
+
     return () => clearInterval(interval);
   }, [selectedCampaignId]);
+
+  const exportToCSV = async () => {
+    try {
+      const csvData = await json2csv(campaigns);
+      const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+      saveAs(blob, 'analytics-data.csv');
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+    }
+  };
 
   const selectedCampaign = campaigns.find((c) => c.id === selectedCampaignId);
 
@@ -118,14 +109,13 @@ const AnalyticsDashboard: React.FC = () => {
       )
     : dailyEngagement;
 
-  const keyMap = {
+  const metricKeyMap = {
     'Open Rate': 'openRate',
     'Click-Through Rate': 'clickThroughRate',
     'Response Rate': 'responseRate',
-    'Bounce Rate': 'bounceRate',
   };
 
-  const selectedMetricKey = keyMap[metricType];
+  const selectedMetricKey = metricKeyMap[metricType];
 
   const lineData = {
     labels: filteredEngagement.map((entry) => entry.date),
@@ -151,12 +141,11 @@ const AnalyticsDashboard: React.FC = () => {
           'rgba(96, 165, 250, 0.8)',
           'rgba(236, 72, 153, 0.8)',
           'rgba(239, 68, 68, 0.8)',
-          'rgba(124, 58, 237, 0.8)',
         ],
       },
     ],
   };
-  
+
   const pieData = {
     labels: ['Bounces', 'Unsubscribes'],
     datasets: [
@@ -175,14 +164,11 @@ const AnalyticsDashboard: React.FC = () => {
       <Navbar />
       <header className="p-4 border-b bg-gray-800 text-yellow-500 flex justify-between items-center">
         <h1 className="text-xl font-bold">Analytics Dashboard</h1>
-        <div className="flex items-center">
-          <span>Dark Mode</span>
-          <Switch
-            checked={darkMode}
-            onChange={() => setDarkMode(!darkMode)}
-            className="ml-2"
-          />
-        </div>
+        <Switch
+          checked={darkMode}
+          onChange={() => setDarkMode(!darkMode)}
+          className="ml-2"
+        />
       </header>
 
       <div className="p-6 space-y-6">
@@ -203,16 +189,16 @@ const AnalyticsDashboard: React.FC = () => {
           <Col span={6}>
             <RangePicker
               onChange={(dates) => setDateRange(dates || null)}
-              className={`w-full `}
+              className="w-full"
             />
           </Col>
           <Col span={6}>
             <Select
               value={metricType}
               onChange={(value) => setMetricType(value)}
-              className={`w-full ${darkMode ? 'bg-gray-800 text-yellow-500' : ''}`}
+              className="w-full"
             >
-              {Object.keys(keyMap).map((key) => (
+              {Object.keys(metricKeyMap).map((key) => (
                 <Option key={key} value={key}>
                   {key}
                 </Option>
@@ -245,7 +231,6 @@ const AnalyticsDashboard: React.FC = () => {
         <Button
           onClick={exportToCSV}
           type="primary"
-          htmlType="submit"
           className="bg-yellow-500 hover:bg-yellow-600 text-black"
         >
           Export as CSV
