@@ -161,55 +161,65 @@ const Home: React.FC = () => {
         <div className="bg-black bg-opacity-0 text-black py-12">
           <h2 className="text-3xl font-bold text-center mb-6">Core Features</h2>
           <Content className="p-8">
-            <Row gutter={[16, 16]} justify="center">
-              {coreFeatures.map((feature, index) => (
-                <Col xs={24} sm={12} md={8} lg={6} key={index}>
-                  <Card
-                    hoverable
-                    style={{
-                      height: "320px",
-                      width: "320px",
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "space-between",
-                    }}
-                    className="bg-black text-yellow-300 text-center border-2 border-yellow-500 shadow-lg"
-                  >
-                    <Box className="flex justify-center mb-4">
-                      {feature.icon}
-                    </Box>
-                    <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                    <p className="text-sm mb-4">{feature.description}</p>
-                    {feature.title === "Email Campaign Automation" ? (
-                      <Link to="/dashboard/campaign" style={{ textDecoration: "none" }}>
-                        <Button
-                          variant="contained"
-                          style={{ backgroundColor: "#FACC15", color: "black" }}
-                        >
-                          Learn More
-                        </Button>
-                      </Link>
-                    ) : feature.title === "Performance Analytics" ? (
-                      <Link to="/dashboard/analytics" style={{ textDecoration: "none" }}>
-                        <Button
-                          variant="contained"
-                          style={{ backgroundColor: "#FACC15", color: "black" }}
-                        >
-                          Learn More
-                        </Button>
-                      </Link>
-                    ) : (
+          <Row gutter={[16, 16]} justify="center">
+            {coreFeatures.map((feature, index) => (
+              <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                <Card
+                  hoverable
+                  style={{
+                    height: "320px",
+                    width: "320px",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                  }}
+                  className="bg-black text-yellow-300 text-center border-2 border-yellow-500 shadow-lg"
+                >
+                  <Box className="flex justify-center mb-4">
+                    {feature.icon}
+                  </Box>
+                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                  <p className="text-sm mb-4">{feature.description}</p>
+                  {feature.title === "Email List Management" ? (
+                    <Link to="/dashboard/emails" style={{ textDecoration: "none" }}>
                       <Button
                         variant="contained"
                         style={{ backgroundColor: "#FACC15", color: "black" }}
                       >
                         Learn More
                       </Button>
-                    )}
-                  </Card>
-                </Col>
-              ))}
-            </Row>
+                    </Link>
+                  ) : feature.title === "Email Campaign Automation" ? (
+                    <Link to="/dashboard/campaign" style={{ textDecoration: "none" }}>
+                      <Button
+                        variant="contained"
+                        style={{ backgroundColor: "#FACC15", color: "black" }}
+                      >
+                        Learn More
+                      </Button>
+                    </Link>
+                  ) : feature.title === "Performance Analytics" ? (
+                    <Link to="/dashboard/analytics" style={{ textDecoration: "none" }}>
+                      <Button
+                        variant="contained"
+                        style={{ backgroundColor: "#FACC15", color: "black" }}
+                      >
+                        Learn More
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      variant="contained"
+                      style={{ backgroundColor: "#FACC15", color: "black" }}
+                    >
+                      Learn More
+                    </Button>
+                  )}
+                </Card>
+              </Col>
+            ))}
+          </Row>
+
           </Content>
         </div>
 
