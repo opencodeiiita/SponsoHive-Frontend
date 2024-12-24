@@ -25,11 +25,13 @@ const App = () => {
         <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
         <Route path="/dashboard/campaign" element={<CampaignAutomation />} />
         <Route path="/dashboard/addfile" element={<BulkUpload/>} />
-<<<<<<< HEAD
+
         <Route path="dashboard/EmailTemplateManager" element={<EmailTemplateManager />} />
-=======
+
         <Route path="/dashboard/emails" element={<EmailListManager/>} />
->>>>>>> 8bdd95faa19b592372d3b551034251b20fe7fb03
+
+        <Route path="/dashboard/emails" element={<EmailListManager/>} />
+
       </Routes>
     </Router>
   );
