@@ -11,7 +11,7 @@ import LoginPage from "./pages/Login";
 import SignPage from "./pages/Signup";
 import TemplateInsights from "./pages/TemplatesInsights";
 import BulkUpload from "./pages/BulkUpload";
-import EmailTemplateManager from "./pages/Integration";
+
 const App = () => {
   return (
     <Router>
@@ -25,13 +25,7 @@ const App = () => {
         <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
         <Route path="/dashboard/campaign" element={<CampaignAutomation />} />
         <Route path="/dashboard/addfile" element={<BulkUpload/>} />
-
-        <Route path="dashboard/EmailTemplateManager" element={<EmailTemplateManager />} />
-
         <Route path="/dashboard/emails" element={<EmailListManager/>} />
-
-        <Route path="/dashboard/emails" element={<EmailListManager/>} />
-
       </Routes>
     </Router>
   );
