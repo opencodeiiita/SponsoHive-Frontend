@@ -14,7 +14,7 @@ export default function EmailPreview({ title,subject,body, placeholders }: Email
 
   return (
     <motion.div 
-      className="p-6 rounded-lg shadow-xl bg-yellow-500 relative"
+      className="p-6 rounded-lg shadow-xl bg-yellow-500 text-white relative"
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.3 }}
