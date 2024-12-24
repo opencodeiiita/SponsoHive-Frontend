@@ -1,0 +1,103 @@
+/* General styles */
+body {
+  background-color: black;
+  color: yellow;
+}
+
+/* Template button styles */
+button {
+  background-color: yellow;
+  color: black;
+  border: 2px solid gray;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #ffcc00; /* Slightly darker yellow on hover */
+}
+
+/* Placeholder customization section */
+.placeholder-heading {
+  color: white; /* Make placeholder headings white */
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+input[type="text"] {
+  background-color: black; /* Black background for input boxes */
+  color: white; /* White text for input boxes */
+  border: 1px solid yellow; /* Yellow border for input boxes */
+  border-radius: 5px;
+  padding: 10px;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  border: 1px solid #ffcc00; /* Slightly brighter yellow on focus */
+}
+
+/* Template Name and Template Body section */
+textarea,
+input[type="text"].template-section {
+  background-color: black; /* Black background for Template Name and Template Body */
+  color: white; /* White text */
+  border: 1px solid yellow;
+  border-radius: 5px;
+  padding: 10px;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+textarea:focus,
+input[type="text"].template-section:focus {
+  outline: none;
+  border-color: #ffcc00; /* Brighter yellow on focus */
+}
+
+/* Table styles */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  padding: 10px;
+  text-align: left;
+}
+
+table th {
+  background-color: yellow;
+  color: black;
+}
+
+table td {
+  background-color: black;
+  color: white;
+}
+
+table tr:hover td {
+  background-color: #ffcc00; /* Highlight on hover */
+}
+
+/* Email Preview section */
+.email-preview {
+  background-color: yellow;
+  color: black;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.email-preview-title {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.email-preview-subject {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
