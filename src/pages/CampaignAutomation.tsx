@@ -110,9 +110,9 @@
 //     },
 //   ];
 
-//   // const insertPlaceholder = (placeholder: string) => {
-//   //   setContent((prev) => `${prev}${placeholder}`);
-//   // };
+//   const insertPlaceholder = (placeholder: string) => {
+//     setContent((prev) => `${prev}${placeholder}`);
+//   };
 //   const insertPlaceholder = (placeholder: string) => {
 //     const textarea = document.getElementById('emailContent') as HTMLTextAreaElement;
 //     if (textarea) {
@@ -460,6 +460,7 @@ import { Button, Input, Table, DatePicker, TimePicker, Form, Modal, Card, Statis
 import { PlusOutlined } from '@ant-design/icons';
 import { emailCampaignData, campaignSummary } from '../utils/dummyEmailData';
 import '../styles/EmailAutomation.css';
+import { cyan } from '@mui/material/colors';
 const { RangePicker } = DatePicker;
 const predefinedPlaceholders = ['{recipientName}', '{companyName}', '{eventName}'];
 
@@ -469,7 +470,7 @@ interface Template {
   created: string;
   placeholders?: string[];
 }
-const predefinedPlaceholders: string[] = ['{recipientName}', '{companyName}', '{eventName}'];
+// const predefinedPlaceholders: string[] = ['{recipientName}', '{companyName}', '{eventName}'];
 
 const dummyData = {
   recipientName: 'John Doe',
@@ -488,12 +489,12 @@ const CampaignAutomation: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = React.useState(false);
 
-  const [content, setContent] = React.useState<string>('');
-  const [templates, setTemplates] = React.useState<Template[]>([]);
+  // const [content, setContent] = React.useState<string>('');
+  // const [templates, setTemplates] = React.useState<Template[]>([]);
   const [selectedTemplateContent, setSelectedTemplateContent] = React.useState<string>('');
 
 
-  const [selectedTemplateContent, setSelectedTemplateContent] = React.useState<string>('');
+  // const [selectedTemplateContent, setSelectedTemplateContent] = React.useState<string>('');
   const [templates, setTemplates] = React.useState<Template[]>([
     { key: '1', name: 'Welcome Email', created: '2024-12-10', placeholders: [] },
     { key: '2', name: 'Follow-Up Email', created: '2024-12-11', placeholders: [] },
@@ -585,40 +586,29 @@ const CampaignAutomation: React.FC = () => {
     }
   };
 
-  const generatePreview = (content: string): string => {
-    return content.replace(/{[a-zA-Z0-9]+}/g, (match) => dummyData[match.slice(1, -1)] || match);
-  };
+  // const generatePreview = (content: string): string => {
+  //   return content.replace(/{[a-zA-Z0-9]+}/g, (match) => dummyData[match.slice(1, -1)] || match);
+  // };
 
-  const validatePlaceholders = (content: string): boolean => {
-    const regex = /{[a-zA-Z0-9]+}/g;
-    const placeholders = content.match(regex);
-    return (
-      placeholders?.every((placeholder) => predefinedPlaceholders.includes(placeholder)) ?? true
-    );
-  };
-
-  const onFinish = (values: { templateName: string }) => {
-    if (!validatePlaceholders(content)) {
-      Modal.error({
-        title: 'Invalid Placeholders',
-        content: 'Use only predefined placeholders.',
-      });
-      return;
-    }
-
-    setTemplates((prev) => [
-      ...prev,
-      { key: `${prev.length + 1}`, name: values.templateName, created: new Date().toISOString() },
+  // const validatePlaceholders = (content: string): boolean => {
+  //   const regex = /{[a-zA-Z0-9]+}/g;
+  //   const placeholders = content.match(regex);
+  //   return (
+  //     placeholders?.every((placeholder) => predefinedPlaceholders.includes(placeholder)) ?? true
+  //   );
+  // };
 
   const openModal = () => {
     setContent('');
     setIsModalOpen(true);
   };
+  
   const closeModal = () => setIsModalOpen(false);
   const closeViewModal = () => setIsViewModalOpen(false);
-
+  
   const onFinish = (values: { templateName: string }) => {
     const { templateName } = values;
+  
     if (!validatePlaceholders(content)) {
       Modal.error({
         title: 'Invalid Placeholders',
@@ -626,30 +616,44 @@ const CampaignAutomation: React.FC = () => {
       });
       return;
     }
+  
     const placeholders = extractPlaceholders(content);
+  
     setTemplates((prev) => [
       ...prev,
-      { key: String(prev.length + 1), name: templateName, created: new Date().toISOString(), placeholders },
-
+      {
+        key: String(prev.length + 1),
+        name: templateName,
+        created: new Date().toISOString(),
+        placeholders,
+      },
     ]);
+  
     setIsModalOpen(false);
   };
+  
   return (
     <div className="email-automation">
       {/* Dashboard */}
       <header>
         <h1>Email Automation</h1>
       </header>
-
-
+  
       {/* Templates */}
       <Table columns={templateColumns} dataSource={templates} />
-
+  
       <Modal open={isModalOpen} onCancel={() => setIsModalOpen(false)} footer={null}>
         <Form layout="vertical" onFinish={onFinish}>
-          <Form.Item label="Template Name" name="templateName" rules={[{ required: true }]}>
+          <Form.Item
+            label="Template Name"
+            name="templateName"
+            rules={[{ required: true }]}
+          >
             <Input />
-
+          </Form.Item>
+        </Form>
+      </Modal>
+  
       <section className="dashboard bg-gray-900 p-6 rounded-lg shadow-lg mb-8">
         <h2 className="text-2xl font-semibold mb-4">Campaign Dashboard</h2>
         <Row gutter={[16, 16]} className="mb-6">
@@ -681,7 +685,7 @@ const CampaignAutomation: React.FC = () => {
           className="bg-gray-800 text-yellow-300 rounded-lg"
         />
       </section>
-
+  
       <main className="content space-y-8">
         <section className="templates bg-gray-900 p-6 rounded-lg shadow-lg">
           <div className="section-header flex justify-between items-center mb-4">
@@ -704,6 +708,7 @@ const CampaignAutomation: React.FC = () => {
             />
           </div>
         </section>
+  
         <section className="scheduler bg-gray-900 p-6 rounded-lg shadow-lg">
           <h2 className="text-2xl font-semibold mb-4">Schedule Emails</h2>
           <Form layout="vertical">
@@ -747,7 +752,7 @@ const CampaignAutomation: React.FC = () => {
           </Form>
         </section>
       </main>
-
+  
       <Modal
         title="Create Email Template"
         open={isModalOpen}
@@ -766,8 +771,7 @@ const CampaignAutomation: React.FC = () => {
               className="w-full bg-gray-800 text-yellow-400 border-yellow-500"
             />
           </Form.Item>
-
-
+  
           <Form.Item>
             <div className="placeholder-buttons mb-4">
               <span className="text-yellow-400">Available Placeholders:</span>
@@ -781,7 +785,6 @@ const CampaignAutomation: React.FC = () => {
                 </Button>
               ))}
             </div>
-
           </Form.Item>
           <Form.Item label="Email Content">
             <Input.TextArea
@@ -792,12 +795,12 @@ const CampaignAutomation: React.FC = () => {
           <Button htmlType="submit">Save</Button>
         </Form>
       </Modal>
-
+  
       <Modal open={isViewModalOpen} onCancel={() => setIsViewModalOpen(false)} footer={null}>
         <p>{selectedTemplateContent}</p>
       </Modal>
     </div>
   );
-};
+}  
 
 export default CampaignAutomation;
