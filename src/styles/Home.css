@@ -1,0 +1,65 @@
+/* Card Styling from Uiverse.io */
+.card {
+    width: 100%;
+    height: auto;
+    border-radius: 20px;
+    background: #1e1e1e; /* Match the dark theme */
+    position: relative;
+    padding: 1.8rem;
+    border: 2px solid #e7cd66; /* Theme color */
+    transition: 0.5s ease-out;
+    overflow: visible;
+    text-align: center;
+    align-items: center;
+  }
+  
+  .card-details {
+    color: white;
+    gap: 0.5em;
+    display: grid;
+    place-content: center;
+    min-height: 180px;
+  }
+  
+  .card-button {
+    transform: translate(-50%, 125%);
+    width: 60%;
+    border-radius: 1rem;
+    border: none;
+    background-color: #e7cd66; /* Theme button color */
+    color: black;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    opacity: 0;
+    transition: 0.3s ease-out;
+  }
+  
+  .text-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #e7cd66; /* Highlight text */
+  }
+  
+  .text-body {
+    font-size: 0.875em;
+    color: #a0a0a0; /* Subtle gray for body text */
+  }
+  
+  /* Hover Effects */
+  .card:hover {
+    border-color: #e7cd66; /* Highlight on hover */
+    box-shadow: 0 4px 18px 0 rgba(0, 0, 0, 0.25);
+  }
+  
+  .card:hover .card-button {
+    transform: translate(-50%, 50%);
+    opacity: 1;
+  }
+  
+  .card:hover .text-title {
+    color: white; /* Highlight title */
+  }
+  

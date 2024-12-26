@@ -1,16 +1,22 @@
 import React from "react";
-import { LoginButton } from "../components/LoginButton";
-import { Layout, Row, Col, Card } from "antd";
+import { Layout, Row, Col } from "antd";
 import { Button, Box } from "@mui/material";
-import { Link } from "react-router-dom"; // Import Link
+import { Link } from "react-router-dom";
 import BGimg from "../assets/cardBG.jpg";
 import Nav_Img from "../assets/main-image.jpg";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-
+import "../styles/Home.css";
 const { Content } = Layout;
 
-const coreFeatures = [
+interface CoreFeature {
+  title: string;
+  description: string;
+  icon: JSX.Element;
+  link?: string;
+}
+
+const coreFeatures: CoreFeature[] = [
   {
     title: "Email List Management",
     description:
@@ -19,9 +25,10 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Email Management"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
+    link: "/dashboard/emails",
   },
   {
     title: "Email Campaign Automation",
@@ -31,9 +38,10 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Email Automation"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
+    link: "/dashboard/campaign",
   },
   {
     title: "Personalization",
@@ -43,7 +51,7 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Personalization"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
   },
@@ -55,9 +63,10 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Analytics"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
+    link: "/dashboard/analytics",
   },
   {
     title: "Integration Capabilities",
@@ -67,7 +76,7 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Integration"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
   },
@@ -79,7 +88,7 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Compliance"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
   },
@@ -91,7 +100,7 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Collaboration"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
   },
@@ -103,7 +112,7 @@ const coreFeatures = [
       <img
         src={Nav_Img}
         alt="Templates"
-        style={{ width: "80px", height: "50px" }}
+        className="w-16 h-16 rounded-full"
       />
     ),
   },
@@ -112,12 +121,9 @@ const coreFeatures = [
 const Home: React.FC = () => {
   return (
     <div
-      className="bg-cover bg-center min-h-screen"
+      className="min-h-screen bg-cover bg-center"
       style={{
         backgroundImage: `url(${BGimg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
       }}
     >
       {/* Navbar */}
@@ -125,101 +131,68 @@ const Home: React.FC = () => {
 
       <Layout className="bg-transparent text-white">
         {/* Hero Section */}
-        <div className="bg-black text-yellow-500 py-16 px-6 md:px-16 mt-16">
+        <div className="bg-black text-[#e7cd66] py-16 px-6 md:px-20 mt-16">
           <Row align="middle" gutter={[64, 32]} justify="center">
             <Col xs={24} md={12}>
-              <h1 className="text-3xl md:text-4xl font-semibold mb-4">
+              <h1 className="text-3xl md:text-5xl font-bold mb-6 leading-snug">
                 Your Sponsorship Drive Made Easy
               </h1>
-              <p className="text-lg mb-6">
+              <p className="text-lg md:text-xl mb-8">
                 Automate outreach, track engagement, and unlock your potential
                 to secure sponsors effortlessly.
               </p>
               <Button
                 variant="contained"
-                style={{
-                  backgroundColor: "#FACC15",
-                  color: "black",
-                  fontWeight: "bold",
-                }}
+                className="bg-[#e2cc70] text-black font-semibold py-2 px-6 rounded-lg shadow-lg hover:bg-[#d6b754]"
               >
                 Get Started
               </Button>
             </Col>
 
-            <Col xs={16} md={8} className="text-center">
+            <Col xs={24} md={8} className="flex justify-center">
               <img
                 src={Nav_Img}
                 alt="Sponsorship"
-                className="rounded-lg shadow-lg mx-auto ml-8"
+                className="rounded-lg shadow-lg w-full max-w-sm"
               />
             </Col>
           </Row>
         </div>
 
         {/* Core Features Section */}
-        <div className="bg-black bg-opacity-0 text-black py-12">
-          <h2 className="text-3xl font-bold text-center mb-6">Core Features</h2>
-          <Content className="p-8">
-          <Row gutter={[16, 16]} justify="center">
-            {coreFeatures.map((feature, index) => (
-              <Col xs={24} sm={12} md={8} lg={6} key={index}>
-                <Card
-                  hoverable
-                  style={{
-                    height: "320px",
-                    width: "320px",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "space-between",
-                  }}
-                  className="bg-black text-yellow-300 text-center border-2 border-yellow-500 shadow-lg"
-                >
-                  <Box className="flex justify-center mb-4">
-                    {feature.icon}
-                  </Box>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-sm mb-4">{feature.description}</p>
-                  {feature.title === "Email List Management" ? (
-                    <Link to="/dashboard/emails" style={{ textDecoration: "none" }}>
-                      <Button
-                        variant="contained"
-                        style={{ backgroundColor: "#FACC15", color: "black" }}
-                      >
-                        Learn More
-                      </Button>
-                    </Link>
-                  ) : feature.title === "Email Campaign Automation" ? (
-                    <Link to="/dashboard/campaign" style={{ textDecoration: "none" }}>
-                      <Button
-                        variant="contained"
-                        style={{ backgroundColor: "#FACC15", color: "black" }}
-                      >
-                        Learn More
-                      </Button>
-                    </Link>
-                  ) : feature.title === "Performance Analytics" ? (
-                    <Link to="/dashboard/analytics" style={{ textDecoration: "none" }}>
-                      <Button
-                        variant="contained"
-                        style={{ backgroundColor: "#FACC15", color: "black" }}
-                      >
-                        Learn More
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Button
-                      variant="contained"
-                      style={{ backgroundColor: "#FACC15", color: "black" }}
-                    >
-                      Learn More
-                    </Button>
-                  )}
-                </Card>
-              </Col>
-            ))}
-          </Row>
-
+        <div className="bg-gradient-to-b from-gray-900 to-black text-white py-12">
+          <h2 className="text-4xl font-bold text-center mb-12">Core Features</h2>
+          <Content className="px-8 md:px-16">
+            <Row gutter={[24, 24]} justify="center">
+              {coreFeatures.map((feature, index) => (
+                <Col xs={24} sm={12} md={8} lg={6} key={index}>
+                  <div className="card bg-gray-800 hover:bg-gray-700 rounded-lg shadow-lg p-6 group relative transition-all duration-300">
+                    <div className="card-details text-center flex flex-col items-center gap-4">
+                      <Box className="transform group-hover:scale-110 transition-transform duration-300">
+                        {feature.icon}
+                      </Box>
+                      <h3 className="text-lg font-semibold text-[#e7cd66] group-hover:text-white">
+                        {feature.title}
+                      </h3>
+                      <p className="text-sm text-gray-300 group-hover:text-gray-100">
+                        {feature.description}
+                      </p>
+                      {feature.link ? (
+                        <Link to={feature.link}>
+                          <button className="card-button bg-[#e7cd66] text-black font-medium px-4 py-2 rounded-md shadow-md hover:bg-[#d6b754] transition-all duration-300">
+                            Learn More
+                          </button>
+                        </Link>
+                      ) : (
+                        <button className="card-button bg-[#e7cd66] text-black font-medium px-4 py-2 rounded-md shadow-md hover:bg-[#d6b754] transition-all duration-300">
+                          Learn More
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </Col>
+              ))}
+            </Row>
           </Content>
         </div>
 

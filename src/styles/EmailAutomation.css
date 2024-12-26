@@ -1,47 +1,56 @@
 .email-automation-page {
   font-family: 'Inter', sans-serif;
+  background-color: #000; /* Black background */
+  color: #fff; /* White text for contrast */
 }
 
 .header {
-  border-bottom: 1px solid #e5e7eb;
+  border-bottom: 1px solid #ffd700; /* Yellow border to match theme */
 }
 
 .section-header h2,
-.templates h2, 
+.templates h2,
 .scheduler h2 {
-  font-size: 1.25rem;
-/* margin-left: 10px; */
+  font-size: 1.5rem; /* Slightly larger font */
+  color: #ffd700; /* Yellow text */
 }
 
 .section-header .ant-btn {
   border-radius: 0.375rem;
+  background-color: #ffd700; /* Yellow button */
+  color: #000; /* Black text for buttons */
 }
 
 .table {
-  border: 1px solid #e5e7eb;
+  border: 1px solid #ffd700; /* Yellow border */
   border-radius: 0.375rem;
+  background-color: #111; /* Slightly lighter black for contrast */
+  color: #fff;
 }
 
 .ant-btn-primary {
-  background-color: #2563eb; /* Blue-600 */
-  border-color: #2563eb;
-  font-size: 0.875rem;
+  background-color: #ffd700; /* Yellow primary button */
+  border-color: #ffd700;
+  font-size: 1rem;
   padding: 0.5rem 1rem;
+  color: #000; /* Black text for buttons */
 }
 
 .ant-btn-primary:hover {
-  background-color: #1d4ed8; /* Blue-700 */
-  border-color: #1d4ed8;
+  background-color: #ffcc00; /* Slightly darker yellow */
+  border-color: #ffcc00;
 }
 
 .ant-modal {
   border-radius: 0.5rem;
+  background-color: #111; /* Slightly lighter black */
+  color: #fff;
 }
 
 .ant-modal-header {
   font-weight: 600;
-  font-size: 1.125rem;
-  color: #1f2937; /* Gray-800 */
+  font-size: 1.25rem;
+  color: #ffd700; /* Yellow for headers */
 }
 
 .ant-modal-footer {
