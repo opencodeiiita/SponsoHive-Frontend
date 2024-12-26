@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Table, Modal, Input, Form, Row, Col, Select, Checkbox, Tag, notification, Space } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { emailCampaignData, campaignSummary, dummyEmailData } from '../utils/dummyEmailData';
+import { PlusOutlined } from '@ant-design/icons';
+import { dummyEmailData } from '../../../utils/dummyEmailData.ts';
 const { Option } = Select;
 
 interface Contact {

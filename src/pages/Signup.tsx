@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button, Typography, Form, message } from "antd";
 import { TextField } from "@mui/material";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
@@ -10,6 +10,11 @@ import SignupImage from "../assets/Login.svg";
 
 import "tailwindcss/tailwind.css";
 
+interface User {
+  username: string;
+  email: string;
+  password: string;
+}
 const SignupPage = () => {
   const [focusedField, setFocusedField] = useState("");
   const [credentials, setCredentials] = useState({
@@ -19,9 +24,11 @@ const SignupPage = () => {
     confirmPassword: "",
   });
 
-  const handleFocus = (field) => setFocusedField(field);
+  const handleFocus = (field: string) => setFocusedField(field);
+
   const handleBlur = () => setFocusedField("");
-  const handleChange = (e) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
   };
 
@@ -36,7 +43,7 @@ const SignupPage = () => {
       return message.error("Passwords do not match!");
     }
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const users: User[] = JSON.parse(localStorage.getItem("users") || "[]");
     const userExists = users.find((user) => user.username === username);
 
     if (userExists) {

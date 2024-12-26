@@ -1,3 +1,34 @@
+/**
+ * @typedef {Object} CampaignMetrics
+ * @property {number} openRate
+ * @property {number} clickThroughRate
+ * @property {number} responseRate
+ * @property {number} bounces
+ * @property {number} unsubscribes
+ * @property {number} totalEmailsSent
+ * @property {number} totalResponses
+ * @property {number} totalBounces
+ * @property {number} totalUnsubscribes
+ */
+
+/**
+ * @typedef {Object} DailyEngagement
+ * @property {string} date
+ * @property {number} openRate
+ * @property {number} clickThroughRate
+ * @property {number} responseRate
+ */
+
+/**
+ * @typedef {Object} Campaign
+ * @property {number} id
+ * @property {string} name
+ * @property {string} schedule
+ * @property {CampaignMetrics} metrics
+ * @property {DailyEngagement[]} dailyEngagement
+ */
+
+/** @type {Campaign[]} */
 export const dummyCampaigns = [
   {
     id: 1,
@@ -127,7 +158,12 @@ export const dummyCampaigns = [
   },
 ];
 
-export const generateRealTimeData = (campaignId) => {
+/**
+ * Generates real-time data for a given campaign.
+ * @param {number} campaignId - The ID of the campaign.
+ * @returns {CampaignMetrics | null} The real-time metrics, or null if not found.
+ */
+export const generateRealTimeData = (campaignId: Number) => {
   const campaign = dummyCampaigns.find((c) => c.id === campaignId);
   if (!campaign) return null;
 
