@@ -57,16 +57,21 @@ my-react-app
 │   ├── hooks
 │   │   └── useAuth.ts
 │   ├── pages
-│   │   ├── AnalyticsDashboard.tsx
-│   │   ├── CampaignAutomation.tsx
-│   │   ├── Compliance.tsx
-│   │   ├── Dashboard.tsx
-│   │   ├── EmailListManager.tsx
-│   │   ├── Home.tsx
-│   │   ├── Integration.tsx
-│   │   ├── Login.tsx
-│   │   ├── Signup.tsx
-│   │   ├── TemplatesInsights.tsx
+|   |   |──CoreFeatures
+|   |      └── analytics
+│   │          └── AnalyticsDashboard.tsx
+|   |      └── Campaign
+│   │          ├── CampaignAutomation.tsx
+               └── BulkUpload.tsx
+           └── collaboration-tools 
+               └── Compliance.tsx
+           └──compliance
+           └── emails
+               └── EmailListManager.tsx
+           └── integration
+               └── Integration.tsx
+           └── Personalization
+           └── Templates-Insights
 │   ├── routes
 │   │   └── AppRoutes.tsx
 │   ├── services
@@ -84,7 +89,9 @@ my-react-app
 │   │   └── global.css
 │   ├── utils
 │   │   ├── parseCSV.ts
-│   │   └── validateEmail.ts
+│   │   |── validateEmail.ts
+|   |   |── dummyData.ts
+|   |   |── dummyEmailData.ts
 │   ├── App.tsx
 │   ├── main.tsx
 │   ├── vite-env.d.ts

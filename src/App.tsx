@@ -3,14 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Navigate } from "react-router-dom";
 import Home from "./pages/Home";
 
-import AnalyticsPage from "./pages/AnalyticsDashboard";
+import AnalyticsPage from "./pages/CoreFeatures/analytics/AnalyticsDashboard";
 import './styles/global.css';
-import EmailListManager from "./pages/EmailListManager";
-import CampaignAutomation from "./pages/CampaignAutomation";
+import EmailListManager from "./pages/CoreFeatures/emails/EmailListManager";
+import CampaignAutomation from "./pages/CoreFeatures/Campaign/CampaignAutomation";
 import LoginPage from "./pages/Login";
 import SignPage from "./pages/Signup";
 import TemplateInsights from "./pages/TemplatesInsights";
-import BulkUpload from "./pages/BulkUpload";
+import BulkUpload from "./pages/CoreFeatures/Campaign/BulkUpload";
 
 const App = () => {
   return (
