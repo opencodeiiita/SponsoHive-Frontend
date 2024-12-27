@@ -60,4 +60,11 @@ export const dummyEmailData = [
   { key: '3', name: 'Alice Johnson', email: 'alice.johnson@example.com', category: 'Marketing', tags: ['Lead'] },
   { key: '4', name: 'Bob Brown', email: 'bob.brown@example.com', category: 'High Priority', tags: ['Urgent'] },
   { key: '5', name: 'Charlie Davis', email: 'charlie.davis@example.com', category: 'Tech Industry', tags: ['Customer'] },
+  { key: '6', name: 'Eve Miller', email: 'eve.miller@example.com', category: 'Education', tags: ['Teacher'] },
+  { key: '7', name: 'Frank Green', email: 'frank.green@example.com', category: 'Retail', tags: ['Vendor'] },
+  { key: '8', name: 'Grace Lee', email: 'grace.lee@example.com', category: 'Finance', tags: ['Investor'] },
+  { key: '9', name: 'Hannah White', email: 'hannah.white@example.com', category: 'Tech Industry', tags: ['Customer', 'Premium'] },
+  { key: '10', name: 'Ian Black', email: 'ian.black@example.com', category: 'Logistics', tags: ['Supplier'] },
+  { key: '11', name: 'Jack King', email: 'jack.king@example.com', category: 'Tech Industry', tags: ['Developer'] }
 ];
+
