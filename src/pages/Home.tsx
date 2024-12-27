@@ -1,120 +1,75 @@
 import React from "react";
 import { Layout, Row, Col } from "antd";
+import { motion } from "framer-motion";
+import { FaEnvelope, FaRobot, FaUserCircle, FaChartBar, FaPlug, FaShieldAlt, FaUsers, FaFileAlt } from 'react-icons/fa';
+import FeatureCard from "../components/FeatureCard";
 import { Button, Box } from "@mui/material";
-import { Link } from "react-router-dom";
 import BGimg from "../assets/cardBG.jpg";
+import Collaboration from "../assets/Collaboration.jpg";
+import Compliance from "../assets/Compliance.jpg";
+import EmailContentAutomation from "../assets/Email Content Automation.jpg";
+import EmailListManagement from "../assets/Email List Management.jpg";
+import IntegrationCapabilities from "../assets/Integration Capabilities.jpg";
+import PerformanceAnalytics from "../assets/Performance Analytics.jpg";
+import Personalisation from "../assets/Personalisation.jpg";
+import Templates from "../assets/Templates & Insights.jpg";
 import Nav_Img from "../assets/main-image.jpg";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import "../styles/Home.css";
 const { Content } = Layout;
 
-interface CoreFeature {
-  title: string;
-  description: string;
-  icon: JSX.Element;
-  link?: string;
-}
-
-const coreFeatures: CoreFeature[] = [
+const coreFeatures = [
   {
     title: "Email List Management",
-    description:
-      "Upload email lists in bulk via CSV/Excel. Organize and categorize contacts. Detect duplicates and invalid emails.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Email Management"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "Upload email lists in bulk via CSV/Excel. Organize and categorize contacts. Detect duplicates and invalid emails.",
+    icon: FaEnvelope,
     link: "/dashboard/emails",
+    bgImage: EmailListManagement,
   },
   {
     title: "Email Campaign Automation",
-    description:
-      "Create custom email templates. Schedule automated email dispatch and set follow-up sequences for non-responders.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Email Automation"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "Create custom email templates. Schedule automated email dispatch and set follow-up sequences for non-responders.",
+    icon: FaRobot,
     link: "/dashboard/campaign",
+    bgImage: EmailContentAutomation,
   },
   {
     title: "Personalization",
-    description:
-      "Use placeholders for personalized content. Add attachments like sponsorship proposals or brochures.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Personalization"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "Use placeholders for personalized content. Add attachments like sponsorship proposals or brochures.",
+    icon: FaUserCircle,
+    bgImage: Personalisation,
   },
   {
     title: "Performance Analytics",
-    description:
-      "Track open rates, click-through rates, and response rates. Monitor bounce rates and manage unsubscribes.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Analytics"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "Track open rates, click-through rates, and response rates. Monitor bounce rates and manage unsubscribes.",
+    icon: FaChartBar,
     link: "/dashboard/analytics",
+    bgImage: PerformanceAnalytics,
   },
   {
     title: "Integration Capabilities",
-    description:
-      "Connect with CRMs like HubSpot or Salesforce. Integrate with social media for enhanced contact research.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Integration"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "Connect with CRMs like HubSpot or Salesforce. Integrate with social media for enhanced contact research.",
+    icon: FaPlug,
+    bgImage: IntegrationCapabilities,
   },
   {
     title: "Compliance",
-    description:
-      "GDPR and CAN-SPAM compliant features. Ensure opt-out options and sender verification.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Compliance"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "GDPR and CAN-SPAM compliant features. Ensure opt-out options and sender verification.",
+    icon: FaShieldAlt,
+    bgImage: Compliance,
   },
   {
     title: "Collaboration Tools",
-    description:
-      "Multi-user access for teams. Assign tasks and follow up on specific contacts.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Collaboration"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "Multi-user access for teams. Assign tasks and follow up on specific contacts.",
+    icon: FaUsers,
+    bgImage: Collaboration,
   },
   {
     title: "Templates & Insights",
-    description:
-      "Pre-designed templates for sponsorship requests. Insights on email timing and outreach improvement.",
-    icon: (
-      <img
-        src={Nav_Img}
-        alt="Templates"
-        className="w-16 h-16 rounded-full"
-      />
-    ),
+    description: "Pre-designed templates for sponsorship requests. Insights on email timing and outreach improvement.",
+    icon: FaFileAlt,
+    bgImage: Templates,
   },
 ];
 
@@ -160,41 +115,54 @@ const Home: React.FC = () => {
         </div>
 
         {/* Core Features Section */}
-        <div className="bg-gradient-to-b from-gray-900 to-black text-white py-12">
-          <h2 className="text-4xl font-bold text-center mb-12">Core Features</h2>
-          <Content className="px-8 md:px-16">
-            <Row gutter={[24, 24]} justify="center">
+        <section className="bg-gradient-to-b from-gray-900 to-black py-16">
+          <div className="container mx-auto px-8 md:px-23">
+            {/* Core Features Heading Container */}
+            <motion.div
+              className="relative mb-12 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="absolute inset-0 bg-yellow-400 opacity-10 rounded-lg group-hover:opacity-20 transition-opacity duration-300"></div>
+              <motion.h2
+                className="text-4xl font-bold relative p-4 z-10 text-yellow-400"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                Core Features
+              </motion.h2>
+            </motion.div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
               {coreFeatures.map((feature, index) => (
-                <Col xs={24} sm={12} md={8} lg={6} key={index}>
-                  <div className="card bg-gray-800 hover:bg-gray-700 rounded-lg shadow-lg p-6 group relative transition-all duration-300">
-                    <div className="card-details text-center flex flex-col items-center gap-4">
-                      <Box className="transform group-hover:scale-110 transition-transform duration-300">
-                        {feature.icon}
-                      </Box>
-                      <h3 className="text-lg font-semibold text-[#e7cd66] group-hover:text-white">
-                        {feature.title}
-                      </h3>
-                      <p className="text-sm text-gray-300 group-hover:text-gray-100">
-                        {feature.description}
-                      </p>
-                      {feature.link ? (
-                        <Link to={feature.link}>
-                          <button className="card-button bg-[#e7cd66] text-black font-medium px-4 py-2 rounded-md shadow-md hover:bg-[#d6b754] transition-all duration-300">
-                            Learn More
-                          </button>
-                        </Link>
-                      ) : (
-                        <button className="card-button bg-[#e7cd66] text-black font-medium px-4 py-2 rounded-md shadow-md hover:bg-[#d6b754] transition-all duration-300">
-                          Learn More
-                        </button>
-                      )}
-                    </div>
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                >
+                  {/* Feature Container */}
+                  <div className="relative p-4 rounded-lg shadow-lg mb-4 text-center flex flex-col items-center">
+                    <div className="absolute inset-0 bg-yellow-400 opacity-10 rounded-lg"></div>
+                    <feature.icon className="text-yellow-400 text-3xl mb-2 relative z-10" />
+                    <h3 className="text-xl font-semibold text-yellow-400 relative z-10">
+                      {feature.title}
+                    </h3>
                   </div>
-                </Col>
+
+                  <FeatureCard
+                    title={feature.title}
+                    description={feature.description}
+                    link={feature.link}
+                    bgImage={feature.bgImage}
+                  />
+                </motion.div>
               ))}
-            </Row>
-          </Content>
-        </div>
+            </div>
+          </div>
+        </section>
 
         {/* Footer */}
         <Footer />
@@ -202,5 +170,6 @@ const Home: React.FC = () => {
     </div>
   );
 };
+
 
 export default Home;
