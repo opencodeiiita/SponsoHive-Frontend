@@ -21,6 +21,7 @@ const FeatureCard: React.FC<CoreFeature> = ({ title, description, link, bgImage 
         scale: 1.05,
       }}
     >
+      
       <motion.div
         className="absolute inset-0 bg-yellow-400"
       />
