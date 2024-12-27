@@ -22,7 +22,7 @@ const FeatureCard: React.FC<CoreFeature> = ({ title, description, link, bgImage 
       }}
     >
       <motion.div
-        className="absolute inset-0 bg-yellow-400 opacity-10 group-hover:opacity-20 transition-opacity duration-300"
+        className="absolute inset-0 bg-yellow-400"
       />
 
       <motion.div
