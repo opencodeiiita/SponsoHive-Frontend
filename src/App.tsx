@@ -9,7 +9,7 @@ import EmailListManager from "./pages/CoreFeatures/emails/EmailListManager";
 import CampaignAutomation from "./pages/CoreFeatures/Campaign/CampaignAutomation";
 import LoginPage from "./pages/Login";
 import SignPage from "./pages/Signup";
-import TemplateInsights from "./pages/TemplatesInsights";
+import TemplateInsights from "./pages/CoreFeatures/templateAndInsights/TemplatesInsights";
 import BulkUpload from "./pages/CoreFeatures/Campaign/BulkUpload";
 
 const App = () => {

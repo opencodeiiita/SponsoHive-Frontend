@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import TemplateSelector from "../components/TemplateSelector";
-import PlaceholderForm from "../components/PlaceholderForm";
-import EmailPreview from "../components/EmailPreview";
+import TemplateSelector from "../../../components/TemplateSelector";
+import PlaceholderForm from "../../../components/PlaceholderForm";
+import EmailPreview from "../../../components/EmailPreview";
 
 const templates = {
   template1: {
