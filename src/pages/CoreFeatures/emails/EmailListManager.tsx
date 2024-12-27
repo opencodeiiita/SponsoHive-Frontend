@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
-import { Button, Table, Modal, Input, Form, Row, Col, Select, Checkbox, Tag, notification, Space } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
+import { Button, Table, Input, Select, Tag, notification, Row, Col, Switch } from 'antd';
+import { Pie } from '@ant-design/plots';
 import { dummyEmailData } from '../../../utils/dummyEmailData.ts';
+import Navbar from '../../../components/Navbar';
+import Footer from '../../../components/Footer';
+import '../../../styles/Home.css';
+import { PlusOutlined, DownloadOutlined } from '@ant-design/icons';
 const { Option } = Select;
 
 interface Contact {
@@ -10,302 +14,262 @@ interface Contact {
   email: string;
   category: string;
   tags: string[];
+  assignedTo: string;
 }
+
 
 const EmailListManager: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>(dummyEmailData);
-  const [categories, setCategories] = useState<string[]>(['High Priority', 'Tech Industry', 'Marketing', 'Healthcare']);
-  const [tags, setTags] = useState<string[]>(['Customer', 'VIP', 'Lead', 'Patient', 'High Risk']);
+  const [categories] = useState<string[]>(['High Priority', 'Tech Industry', 'Marketing', 'Healthcare']);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [searchText, setSearchText] = useState<string>('');
-  const [bulkModalOpen, setBulkModalOpen] = useState(false);
-  const [bulkTags, setBulkTags] = useState<string[]>([]);
-  const [bulkCategory, setBulkCategory] = useState<string>('');
-  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
-  const [tagModalOpen, setTagModalOpen] = useState(false);
-  const [newCategory, setNewCategory] = useState<string>('');
-  const [newTag, setNewTag] = useState<string>('');
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [darkMode, setDarkMode] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize] = useState(5);
 
-  // Filtered contacts based on search and selected category
-  const filteredContacts = contacts
-    .filter((contact) => {
-      const matchesCategory = selectedCategory ? contact.category === selectedCategory : true;
-      const matchesSearch =
-        contact.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        contact.email.toLowerCase().includes(searchText.toLowerCase());
-      return matchesCategory && matchesSearch;
-    })
-    .sort((a, b) => {
-      if (a.category === 'High Priority' && b.category !== 'High Priority') return -1;
-      if (b.category === 'High Priority' && a.category !== 'High Priority') return 1;
-      return a.category.localeCompare(b.category);
-    });
+  // Filtered contacts based on search and category
+  const filteredContacts = contacts.filter((contact) => {
+    const matchesCategory = selectedCategory ? contact.category === selectedCategory : true;
+    const matchesSearch =
+      contact.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      contact.email.toLowerCase().includes(searchText.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
-  // Add, edit, and delete categories
-  const addCategory = () => {
-    if (!newCategory.trim()) return;
-    setCategories((prev) => [...prev, newCategory]);
-    setNewCategory('');
-    notification.success({ message: 'Category Added', description: 'New category added successfully.' });
+  // Pie chart data visualization
+  const categoryDistribution = categories.map((category) => ({
+    type: category,
+    value: contacts.filter((contact) => contact.category === category).length,
+  }));
+
+  // Export to CSV
+  const exportToCSV = () => {
+    const csvContent = [
+      ['Name', 'Email', 'Category', 'Tags', 'Assigned To'],
+      ...filteredContacts.map((contact) => [
+        contact.name,
+        contact.email,
+        contact.category,
+        contact.tags.join(','),
+        contact.assignedTo || 'Unassigned',
+      ]),
+    ]
+      .map((e) => e.join(','))
+      .join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', 'contacts.csv');
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
-  const deleteCategory = (category: string) => {
-    setCategories((prev) => prev.filter((cat) => cat !== category));
-    notification.info({ message: 'Category Deleted', description: 'Category removed successfully.' });
-  };
+  // Pagination logic
+  const startIdx = (currentPage - 1) * pageSize;
+  const paginatedContacts = filteredContacts.slice(startIdx, startIdx + pageSize);
 
-  // Add, edit, and delete tags
-  const addTag = () => {
-    if (!newTag.trim()) return;
-    setTags((prev) => [...prev, newTag]);
-    setNewTag('');
-    notification.success({ message: 'Tag Added', description: 'New tag added successfully.' });
-  };
-
-  const deleteTag = (tag: string) => {
-    setTags((prev) => prev.filter((t) => t !== tag));
-    notification.info({ message: 'Tag Deleted', description: 'Tag removed successfully.' });
-  };
-
-  // Bulk actions logic
-  const handleBulkAssignTags = () => {
-    if (bulkTags.length === 0) {
-      notification.warning({ message: 'No Tags Selected', description: 'Please select at least one tag to apply.' });
-      return;
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prev) => prev - 1);
+      setSelectedRowKeys([]); // Clear selections when changing pages
     }
-
-    setContacts((prevContacts) =>
-      prevContacts.map((contact) =>
-        filteredContacts.includes(contact)
-          ? { ...contact, tags: [...new Set([...contact.tags, ...bulkTags])] }
-          : contact
-      )
-    );
-
-    setBulkModalOpen(false);
-    notification.success({ message: 'Bulk Tags Applied', description: 'Tags applied to all filtered contacts.' });
   };
 
-  const handleBulkAssignCategory = () => {
-    if (!bulkCategory) {
-      notification.warning({ message: 'No Category Selected', description: 'Please select a category to apply.' });
-      return;
+  const handleNextPage = () => {
+    if (currentPage < Math.ceil(filteredContacts.length / pageSize)) {
+      setCurrentPage((prev) => prev + 1);
+      setSelectedRowKeys([]); // Clear selections when changing pages
     }
-
-    setContacts((prevContacts) =>
-      prevContacts.map((contact) =>
-        filteredContacts.includes(contact) ? { ...contact, category: bulkCategory } : contact
-      )
-    );
-
-    setBulkModalOpen(false);
-    notification.success({ message: 'Bulk Category Applied', description: 'Category applied to all filtered contacts.' });
   };
 
-  const columns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
+  // Bulk delete logic
+  const handleBulkDelete = () => {
+    const remainingContacts = contacts.filter((contact) => !selectedRowKeys.includes(contact.key));
+    setContacts(remainingContacts);
+    setSelectedRowKeys([]);
+    notification.success({ message: 'Bulk Delete Successful', description: 'Selected contacts have been deleted.' });
+  };
+
+  // Pie chart config
+  const pieConfig = {
+    appendPadding: 10,
+    data: categoryDistribution,
+    angleField: 'value',
+    colorField: 'type',
+    radius: 0.8,
+    label: {
+      type: 'inner',
+      offset: '-30%',
+      content: '{value}',
+      style: {
+        textAlign: 'center',
+        fontSize: 14,
+      },
     },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Category',
-      dataIndex: 'category',
-      key: 'category',
-      render: (text: string) => <Tag color="geekblue">{text}</Tag>,
-    },
-    {
-      title: 'Tags',
-      dataIndex: 'tags',
-      key: 'tags',
-      render: (tags: string[]) => (
-        <div>
-          {tags.map((tag, index) => (
-            <Tag key={index} color="green">
-              {tag}
-            </Tag>
-          ))}
-        </div>
-      ),
-    },
-  ];
+    interactions: [
+      {
+        type: 'element-active',
+      },
+    ],
+  };
+  
 
   return (
-    <div className="bg-gray-900 text-yellow-500 min-h-screen p-6">
-      <header className="bg-black p-4 rounded mb-6 border-b-2 border-yellow-500">
-        <h1 className="text-3xl font-bold">Contact Manager</h1>
-        <p className="text-yellow-300">Manage your contacts, assign tags and categories, and perform bulk actions.</p>
-      </header>
+    <div
+      className={`min-h-screen bg-cover bg-center ${
+        darkMode ? 'bg-dark text-white' : 'bg-light text-black'
+      }`}
+      style={{
+        backgroundImage: darkMode
+          ? 'linear-gradient(to bottom, #1a202c, #2d3748)'
+          : 'linear-gradient(to bottom, #ffffff, #e6e6e6)',
+      }}
+    >
+      <Navbar />
+      <div className="container mx-auto py-12 px-6">
+        <header
+          className={`p-6 rounded-lg shadow-lg mb-8 ${
+            darkMode ? 'bg-black bg-opacity-50 text-white' : 'bg-gray-200 text-black'
+          }`}
+        >
+          <Row justify="space-between" align="middle">
+            <Col>
+              <h1 className="text-3xl font-bold" style={{ color: darkMode ? '#e7cd66' : '#1a202c' }}>
+                Email List Manager
+              </h1>
+              <p className="text-lg">Manage your contacts and perform bulk actions seamlessly.</p>
+            </Col>
+            <Col>
+              <Switch
+                checked={darkMode}
+                onChange={setDarkMode}
+                checkedChildren="Dark"
+                unCheckedChildren="Light"
+              />
+            </Col>
+          </Row>
+        </header>
 
-      <section className="email-list-dashboard bg-gray-800 p-6 rounded-lg shadow-lg mb-8">
-        <Row gutter={[16, 16]} className="mb-6">
-          <Col span={6}>
-            <Input
-              value={searchText}
-              onChange={(e) => setSearchText(e.target.value)}
-              placeholder="Search by name or email"
-              className=" text-yellow-500"
-            />
-          </Col>
-          <Col span={6}>
-            <Select
-              value={selectedCategory}
-              onChange={setSelectedCategory}
-              placeholder="Select Category"
-              className="bg-gray-700 text-yellow-500"
-            >
-              <Option value="">All Categories</Option>
-              {categories.map((category, index) => (
-                <Option key={index} value={category}>
-                  {category}
-                </Option>
-              ))}
-            </Select>
-          </Col>
-        </Row>
+        <section className="mb-8">
+          <Row gutter={[16, 16]} className="mb-6">
+            <Col span={6}>
+              <Input
+                value={searchText}
+                onChange={(e) => setSearchText(e.target.value)}
+                placeholder="Search by name or email"
+                className={`rounded-md  'bg-white text-black'`}
+              />
+            </Col>
+            <Col span={6}>
+              <Select
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                placeholder="Select Category"
+                className={`rounded-md ${darkMode ? 'bg-gray-700 text-white' : 'bg-white text-black'}`}
+              >
+                <Option value="">All Categories</Option>
+                {categories.map((category, index) => (
+                  <Option key={index} value={category}>
+                    {category}
+                  </Option>
+                ))}
+              </Select>
+            </Col>
+          </Row>
+        </section>
 
-        <Table
-          columns={columns}
-          dataSource={filteredContacts}
-          pagination={false}
-          className="bg-gray-700 text-yellow-300 rounded-lg"
-        />
-      </section>
-
-      <section className="email-list-actions mb-4">
-        <div className="flex justify-between items-center">
-          <h2 className="text-2xl font-semibold">Actions</h2>
-          <Space>
+        <div className={`p-6 rounded-lg shadow-lg mb-8 ${darkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+          <Table
+            rowSelection={{
+              selectedRowKeys,
+              onChange: setSelectedRowKeys,
+            }}
+            columns={[
+              { title: 'Name', dataIndex: 'name', key: 'name' },
+              { title: 'Email', dataIndex: 'email', key: 'email' },
+              {
+                title: 'Category',
+                dataIndex: 'category',
+                key: 'category',
+                render: (text: string) => <Tag color="geekblue">{text}</Tag>,
+              },
+              {
+                title: 'Tags',
+                dataIndex: 'tags',
+                key: 'tags',
+                render: (tags: string[]) => (
+                  <div>
+                    {tags.map((tag, index) => (
+                      <Tag key={index} color="green">
+                        {tag}
+                      </Tag>
+                    ))}
+                  </div>
+                ),
+              },
+            ]}
+            dataSource={paginatedContacts}
+            pagination={false}
+            rowKey="key"
+          />
+          <Row justify="space-between" align="middle" className="mt-4">
             <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => setBulkModalOpen(true)}
-              className="bg-yellow-500 hover:bg-yellow-600 text-black border-none"
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className={`rounded-md ${darkMode ? 'bg-yellow-500 text-white' : 'bg-yellow-400 text-black'}`}
             >
-              Bulk Actions
+              Previous Page
             </Button>
             <Button
-              type="default"
-              onClick={() => setCategoryModalOpen(true)}
-              className="bg-gray-700 text-yellow-500"
+              onClick={handleNextPage}
+              disabled={currentPage >= Math.ceil(filteredContacts.length / pageSize)}
+              className={`rounded-md ${darkMode ? 'bg-yellow-500 text-white' : 'bg-yellow-400 text-black'}`}
             >
-              Manage Categories
+              Next Page
             </Button>
-            <Button
-              type="default"
-              onClick={() => setTagModalOpen(true)}
-              className="bg-gray-700 text-yellow-500"
-            >
-              Manage Tags
-            </Button>
-          </Space>
+          </Row>
+          <Button
+            onClick={handleBulkDelete}
+            disabled={selectedRowKeys.length === 0}
+            className={`mt-4 rounded-md ${darkMode ? 'bg-red-600 text-white' : 'bg-red-400 text-black'}`}
+          >
+            Bulk Delete
+          </Button>
         </div>
-      </section>
 
-      {/* Bulk Modal */}
-      <Modal
-        title="Bulk Actions"
-        visible={bulkModalOpen}
-        onCancel={() => setBulkModalOpen(false)}
-        footer={null}
-      >
-        <Form>
-          <Form.Item label="Select Tags">
-            <Checkbox.Group
-              options={tags}
-              onChange={(checkedValues) => setBulkTags(checkedValues as string[])}
-            />
-          </Form.Item>
-          <Form.Item label="Select Category">
-            <Select
-              value={bulkCategory}
-              onChange={setBulkCategory}
-              placeholder="Select Category"
-            >
-              {categories.map((category, index) => (
-                <Option key={index} value={category}>
-                  {category}
-                </Option>
-              ))}
-            </Select>
-          </Form.Item>
-          <Space>
-            <Button type="primary" onClick={handleBulkAssignTags}>
-              Apply Tags
-            </Button>
-            <Button type="primary" onClick={handleBulkAssignCategory}>
-              Apply Category
-            </Button>
-          </Space>
-        </Form>
-      </Modal>
+        <section className="mb-4">
+          <h1
+            className="text-4xl font-bold mb-6"
+            style={{ color: darkMode ? '#e7cd66' : '#1a202c' }}
+          >
+            Category Distribution
+          </h1>
+          <div
+            className="p-4 border-1 rounded-lg"
+            style={{
+              borderColor: darkMode ? '#e7cd66' : '#1a202c',
+              backgroundColor: darkMode ? '#2d3748' : '#ffffff',
+            }}
+          >
+            <Pie {...pieConfig} />
+          </div>
+        </section>
 
-      {/* Category Modal */}
-      <Modal
-        title="Manage Categories"
-        visible={categoryModalOpen}
-        onCancel={() => setCategoryModalOpen(false)}
-        footer={null}
-      >
-        <Form>
-          <Form.Item label="Add New Category">
-            <Input
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Enter category name"
-            />
-          </Form.Item>
-          <Button type="primary" onClick={addCategory}>
-            Add Category
-          </Button>
-        </Form>
-        <ul>
-          {categories.map((category, index) => (
-            <li key={index} className="flex justify-between items-center">
-              {category}
-              <Button type="link" danger onClick={() => deleteCategory(category)}>
-                Delete
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </Modal>
-
-      {/* Tag Modal */}
-      <Modal
-        title="Manage Tags"
-        visible={tagModalOpen}
-        onCancel={() => setTagModalOpen(false)}
-        footer={null}
-      >
-        <Form>
-          <Form.Item label="Add New Tag">
-            <Input
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              placeholder="Enter tag name"
-            />
-          </Form.Item>
-          <Button type="primary" onClick={addTag}>
-            Add Tag
-          </Button>
-        </Form>
-        <ul>
-          {tags.map((tag, index) => (
-            <li key={index} className="flex justify-between items-center">
-              {tag}
-              <Button type="link" danger onClick={() => deleteTag(tag)}>
-                Delete
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </Modal>
+        <Button
+          type="primary"
+          icon={<DownloadOutlined />}
+          onClick={exportToCSV}
+          className={`rounded-md ${darkMode ? 'bg-yellow-500 text-white' : 'bg-yellow-400 text-black'}`}
+        >
+          Export CSV
+        </Button>
+      </div>
+      <Footer />
     </div>
   );
 };
