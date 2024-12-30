@@ -57,6 +57,7 @@ const coreFeatures = [
     title: "Compliance",
     description: "GDPR and CAN-SPAM compliant features. Ensure opt-out options and sender verification.",
     icon: FaShieldAlt,
+    link: "/dashboard/compliance",
     bgImage: Compliance,
   },
   {
