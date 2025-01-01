@@ -8,6 +8,7 @@ import './styles/global.css';
 import EmailListManager from "./pages/CoreFeatures/emails/EmailListManager";
 import CampaignAutomation from "./pages/CoreFeatures/Campaign/CampaignAutomation";
 import ComplianceDashboard from "./pages/CoreFeatures/Compilance/ComplianceDashboard";
+import IntegrationPage from "./pages/CoreFeatures/Integration/IntegrationPage";
 import LoginPage from "./pages/Login";
 import SignPage from "./pages/Signup";
 import TemplateInsights from "./pages/CoreFeatures/templateAndInsights/TemplatesInsights";
@@ -28,6 +29,7 @@ const App = () => {
         <Route path="/dashboard/addfile" element={<BulkUpload/>} />
         <Route path="/dashboard/emails" element={<EmailListManager/>} />
         <Route path="/dashboard/compliance" element={<ComplianceDashboard/>} />
+        <Route path="/dashboard/integration" element={<IntegrationPage />} />
       </Routes>
     </Router>
   );
