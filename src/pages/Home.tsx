@@ -51,6 +51,7 @@ const coreFeatures = [
     title: "Integration Capabilities",
     description: "Connect with CRMs like HubSpot or Salesforce. Integrate with social media for enhanced contact research.",
     icon: FaPlug,
+    link: "/dashboard/integration",
     bgImage: IntegrationCapabilities,
   },
   {
