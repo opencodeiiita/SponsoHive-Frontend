@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Loader2, Download, Filter, RefreshCw, AlertTriangle } from 'lucide-react';
+import SenderAuthDashboard from './SenderAuthDashboard';
 
 interface OptOutEntry {
   id: string;
@@ -46,7 +46,8 @@ const ComplianceDashboard = () => {
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'suppression', label: 'Suppression List' },
     { id: 'audit', label: 'Audit Trail' },
-    { id: 'settings', label: 'Compliance Settings' }
+    { id: 'settings', label: 'Compliance Settings' },
+    { id: 'senderAuth', label: 'Sender Authentication' },
   ];
 
   // Mock data loading
@@ -81,11 +82,15 @@ const ComplianceDashboard = () => {
         <h2 className="text-xl font-semibold">Suppression List</h2>
         <div className="flex gap-2">
           <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-            <Filter className="w-4 h-4" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M3 3a1 1 0 011-1h12a1 1 0 011 1v3a1 1 0 01-.293.707L12 11.414V15a1 1 0 01-.293.707l-2 2A1 1 0 018 17v-5.586L3.293 6.707A1 1 0 013 6V3z" clipRule="evenodd" />
+            </svg>
             Filter
           </button>
           <button className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-            <Download className="w-4 h-4" />
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+            </svg>
             Export List
           </button>
         </div>
@@ -124,12 +129,33 @@ const ComplianceDashboard = () => {
     </div>
   );
 
+  const renderSenderAuthDashboard = () => (
+    <div className="bg-white rounded-lg shadow-sm p-6">
+      <SenderAuthDashboard />
+      {(metrics?.gdprCompliance < 100 || metrics?.canSpamCompliance < 100) && (
+        <div className="mt-4 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg flex items-start gap-3">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <div>
+            <h3 className="font-medium text-yellow-800">Authentication Issues Detected</h3>
+            <p className="text-yellow-700 text-sm mt-1">
+              Some authentication issues have been detected. Please review and update your settings for optimal deliverability.
+            </p>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
   const renderAuditTrail = () => (
     <div className="bg-white rounded-lg shadow-sm p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-semibold">Audit Trail</h2>
         <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-          <RefreshCw className="w-4 h-4" />
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clipRule="evenodd" />
+          </svg>
           Refresh
         </button>
       </div>
@@ -153,7 +179,10 @@ const ComplianceDashboard = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <svg className="animate-spin h-8 w-8 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
         <p className="text-lg font-medium">Loading compliance data...</p>
       </div>
     );
@@ -206,7 +235,9 @@ const ComplianceDashboard = () => {
             {/* Alert for non-compliant items */}
             {metrics?.canSpamCompliance < 100 && (
               <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 text-yellow-400 mt-0.5" />
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-yellow-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
                 <div>
                   <h3 className="font-medium text-yellow-800">Compliance Alert</h3>
                   <p className="text-yellow-700 text-sm mt-1">
@@ -431,9 +462,11 @@ const ComplianceDashboard = () => {
             </div>
           </div>
         )}
+        {activeTab === 'senderAuth' && renderSenderAuthDashboard()}
       </div>
     </div>
   );
 };
 
 export default ComplianceDashboard;
+
