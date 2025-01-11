@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { 
-  Loader2, AlertCircle, Check, X, RefreshCw, 
-  Link, Download, Settings, Info,
-  HelpCircle, Clock, ChevronDown, LogOut
-} from 'lucide-react';
+import { Loader2, AlertCircle, Check, X, RefreshCw, Link, Download, Settings, Info, HelpCircle, Clock, ChevronDown, LogOut, Bell } from 'lucide-react';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
-  
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -30,7 +26,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
 const Dropdown = ({ value, onChange, options, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   return (
     <div className="relative">
       <button 
@@ -40,7 +36,7 @@ const Dropdown = ({ value, onChange, options, placeholder }) => {
         {options.find(opt => opt.value === value)?.label || placeholder}
         <ChevronDown className="w-4 h-4" />
       </button>
-      
+
       {isOpen && (
         <div className="absolute top-full mt-1 w-full bg-white border rounded-lg shadow-lg z-10">
           {options.map((option) => (
@@ -74,7 +70,13 @@ const IntegrationPage = () => {
     tags: 'all',
     search: ''
   });
-  
+  const [syncSettings, setSyncSettings] = useState({
+    frequency: 'daily',
+    direction: 'bidirectional',
+    fields: ['email', 'name', 'company', 'phone']
+  });
+  const [notifications, setNotifications] = useState([]);
+
   const [contacts, setContacts] = useState([
     { id: 1, name: 'John Doe', email: 'john@example.com', company: 'Acme Inc', tags: ['Customer'] },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', company: 'Tech Corp', tags: ['Lead'] },
@@ -83,7 +85,6 @@ const IntegrationPage = () => {
     { id: 5, name: 'Tom Brown', email: 'tom@example.com', company: 'Sales Inc', tags: ['Lead'] },
   ]);
 
-  // Load initial data
   useEffect(() => {
     setTimeout(() => {
       setConnections([
@@ -133,7 +134,6 @@ const IntegrationPage = () => {
 
   const handleConnect = async (provider) => {
     setLoading(true);
-    // Simulate OAuth flow
     setTimeout(() => {
       setConnections(prev => prev.map(conn => 
         conn.provider === provider 
@@ -146,7 +146,6 @@ const IntegrationPage = () => {
 
   const handleDisconnect = async (provider) => {
     setLoading(true);
-    // Simulate disconnection
     setTimeout(() => {
       setConnections(prev => prev.map(conn => 
         conn.provider === provider 
@@ -170,7 +169,43 @@ const IntegrationPage = () => {
         message: 'Manual sync completed',
         type: 'sync'
       }, ...prev]);
+      addNotification('Sync completed', 'Successfully synced 25 contacts from HubSpot.');
     }, 2000);
+  };
+
+  const handleImport = () => {
+    setSyncInProgress(true);
+    setTimeout(() => {
+      setSyncInProgress(false);
+      setSyncLogs(prev => [{
+        id: Date.now().toString(),
+        timestamp: new Date().toISOString(),
+        provider: 'hubspot',
+        recordsCount: selectedContacts.length,
+        status: 'success',
+        message: `${selectedContacts.length} contacts imported successfully`,
+        type: 'import'
+      }, ...prev]);
+      addNotification('Import completed', `Successfully imported ${selectedContacts.length} contacts.`);
+      setShowImportModal(false);
+    }, 2000);
+  };
+
+  const handleSaveSettings = () => {
+    setTimeout(() => {
+      addNotification('Settings updated', 'Sync settings have been updated successfully.');
+      setShowSettingsModal(false);
+    }, 1000);
+  };
+
+  const addNotification = (title, message) => {
+    const newNotification = {
+      id: Date.now(),
+      title,
+      message,
+      timestamp: new Date().toISOString(),
+    };
+    setNotifications(prev => [newNotification, ...prev]);
   };
 
   const filteredContacts = contacts.filter(contact => {
@@ -178,16 +213,15 @@ const IntegrationPage = () => {
       contact.name.toLowerCase().includes(filters.search.toLowerCase()) ||
       contact.email.toLowerCase().includes(filters.search.toLowerCase()) ||
       contact.company.toLowerCase().includes(filters.search.toLowerCase());
-    
+
     const matchesTags = filters.tags === 'all' || contact.tags.includes(filters.tags);
-    
+
     return matchesSearch && matchesTags;
   });
 
-  // Import Modal Content
   const ImportModalContent = () => (
     <div className="space-y-6">
-      <div className="flex gap-4">
+      <div className="flex flex-wrap gap-4">
         <Dropdown
           value={filters.dateRange}
           onChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}
@@ -199,7 +233,7 @@ const IntegrationPage = () => {
           ]}
           placeholder="Select Date Range"
         />
-        
+
         <Dropdown
           value={filters.tags}
           onChange={(value) => setFilters(prev => ({ ...prev, tags: value }))}
@@ -221,9 +255,9 @@ const IntegrationPage = () => {
         />
       </div>
 
-      <div className="border rounded-lg overflow-hidden">
+      <div className="border rounded-lg overflow-hidden max-h-96 overflow-y-auto">
         <table className="w-full">
-          <thead className="bg-gray-50">
+          <thead className="bg-gray-50 sticky top-0">
             <tr>
               <th className="px-4 py-3 text-left">
                 <input 
@@ -286,21 +320,24 @@ const IntegrationPage = () => {
             Cancel
           </button>
           <button
-            onClick={() => {
-              setShowImportModal(false);
-              // Handle import
-            }}
+            onClick={handleImport}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            disabled={selectedContacts.length === 0}
+            disabled={selectedContacts.length === 0 || syncInProgress}
           >
-            Import Selected
+            {syncInProgress ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin inline" />
+                Importing...
+              </>
+            ) : (
+              'Import Selected'
+            )}
           </button>
         </div>
       </div>
     </div>
   );
 
-  // Settings Modal Content remains the same...
   const SettingsModalContent = () => (
     <div className="space-y-6">
       <div>
@@ -350,7 +387,7 @@ const IntegrationPage = () => {
         <div className="space-y-2">
           {[
             { value: 'email', label: 'Email' },
-            { value: 'name', label: 'Name' },
+            {value: 'name', label: 'Name' },
             { value: 'company', label: 'Company' },
             { value: 'phone', label: 'Phone' }
           ].map(({ value, label }) => (
@@ -380,10 +417,7 @@ const IntegrationPage = () => {
           Cancel
         </button>
         <button
-          onClick={() => {
-            setShowSettingsModal(false);
-            // Save settings
-          }}
+          onClick={handleSaveSettings}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
         >
           Save Settings
@@ -402,26 +436,29 @@ const IntegrationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header section remains the same... */}
-        <div className="flex justify-between items-center">
+        {/* Header section */}
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">CRM Integrations</h1>
             <p className="text-gray-500 mt-1">Manage your CRM connections and synchronization</p>
           </div>
-          <button 
-            onClick={() => setShowSettingsModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
-          >
-            <Settings className="w-4 h-4" />
-            Integration Settings
-          </button>
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <Bell className="w-6 h-6 text-gray-500 cursor-pointer" />
+              {notifications.length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                  {notifications.length}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Help Banner */}
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6 flex items-start gap-3">
-          <HelpCircle className="w-6 h-6 text-blue-500 mt-0.5" />
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 md:p-6 flex items-start gap-3">
+          <HelpCircle className="w-6 h-6 text-blue-500 mt-0.5 flex-shrink-0" />
           <div>
             <h3 className="font-medium text-blue-800 text-lg">Need Help?</h3>
             <p className="text-blue-600 mt-1">
@@ -431,7 +468,7 @@ const IntegrationPage = () => {
         </div>
 
         {/* CRM Connections */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {connections.map(connection => (
             <div key={connection.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start">
@@ -542,7 +579,7 @@ const IntegrationPage = () => {
 
         {/* Sync Activity */}
         <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
             <h2 className="text-xl font-semibold">Sync Activity</h2>
             <div className="flex items-center gap-4">
               <Dropdown
@@ -620,6 +657,30 @@ const IntegrationPage = () => {
       >
         <SettingsModalContent />
       </Modal>
+
+      {/* Notification Panel */}
+      {notifications.length > 0 && (
+        <div className="fixed bottom-4 right-4 max-w-md w-full bg-white rounded-lg shadow-lg p-4 space-y-2">
+          {notifications.map((notification) => (
+            <div 
+              key={notification.id} 
+              className={`flex items-center gap-2 p-2 rounded ${
+                notification.title.toLowerCase().includes('success') ? 'bg-green-100' : 'bg-blue-100'
+              }`}
+            >
+              {notification.title.toLowerCase().includes('success') ? (
+                <Check className="w-4 h-4 text-green-500" />
+              ) : (
+                <Info className="w-4 h-4 text-blue-500" />
+              )}
+              <div>
+                <p className="font-medium text-sm">{notification.title}</p>
+                <p className="text-xs">{notification.message}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
