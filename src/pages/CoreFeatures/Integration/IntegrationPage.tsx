@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Loader2, AlertCircle, Check, X, RefreshCw, Link, Download, Settings, Info, HelpCircle, Clock, ChevronDown, LogOut, Bell } from 'lucide-react';
+import { Loader2, AlertCircle, Check, X, RefreshCw, Link, Download, Settings, Info, HelpCircle, Clock, ChevronDown, LogOut, UserPlus, Users, FileText, BarChart2 } from 'lucide-react';
+import { CSVLink } from "react-csv";
+import { saveAs } from 'file-saver';
 
 const Modal = ({ isOpen, onClose, title, children }) => {
   if (!isOpen) return null;
-
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-lg max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
@@ -26,7 +28,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
 
 const Dropdown = ({ value, onChange, options, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);
-
+  
   return (
     <div className="relative">
       <button 
@@ -36,7 +38,7 @@ const Dropdown = ({ value, onChange, options, placeholder }) => {
         {options.find(opt => opt.value === value)?.label || placeholder}
         <ChevronDown className="w-4 h-4" />
       </button>
-
+      
       {isOpen && (
         <div className="absolute top-full mt-1 w-full bg-white border rounded-lg shadow-lg z-10">
           {options.map((option) => (
@@ -63,6 +65,7 @@ const IntegrationPage = () => {
   const [loading, setLoading] = useState(true);
   const [showImportModal, setShowImportModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
+  const [showEnrichModal, setShowEnrichModal] = useState(false);
   const [syncInProgress, setSyncInProgress] = useState(false);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [filters, setFilters] = useState({
@@ -70,13 +73,6 @@ const IntegrationPage = () => {
     tags: 'all',
     search: ''
   });
-  const [syncSettings, setSyncSettings] = useState({
-    frequency: 'daily',
-    direction: 'bidirectional',
-    fields: ['email', 'name', 'company', 'phone']
-  });
-  const [notifications, setNotifications] = useState([]);
-
   const [contacts, setContacts] = useState([
     { id: 1, name: 'John Doe', email: 'john@example.com', company: 'Acme Inc', tags: ['Customer'] },
     { id: 2, name: 'Jane Smith', email: 'jane@example.com', company: 'Tech Corp', tags: ['Lead'] },
@@ -84,7 +80,24 @@ const IntegrationPage = () => {
     { id: 4, name: 'Sarah Wilson', email: 'sarah@example.com', company: 'Design Co', tags: ['Customer'] },
     { id: 5, name: 'Tom Brown', email: 'tom@example.com', company: 'Sales Inc', tags: ['Lead'] },
   ]);
+  const [enrichedContacts, setEnrichedContacts] = useState([]);
+  const [crmActivity, setCrmActivity] = useState({
+    contactsImported: 0,
+    contactsExported: 0,
+    detailsChanged: 0
+  });
+  const [activityChartData, setActivityChartData] = useState([]);
+  const [syncSettings, setSyncSettings] = useState({
+    frequency: 'daily',
+    direction: 'bidirectional',
+    fields: ['email', 'name', 'company']
+  });
+  const [errorLogs, setErrorLogs] = useState([]);
+  const [summaryReport, setSummaryReport] = useState([]);
+  const [activeTab, setActiveTab] = useState(0);
+  const [runtimeError, setRuntimeError] = useState(null);
 
+  // Load initial data
   useEffect(() => {
     setTimeout(() => {
       setConnections([
@@ -128,12 +141,62 @@ const IntegrationPage = () => {
         }
       ]);
 
+      setCrmActivity({
+        contactsImported: 1500,
+        contactsExported: 750,
+        detailsChanged: 250
+      });
+
+      setActivityChartData([
+        { date: '2024-12-25', activity: 50 },
+        { date: '2024-12-26', activity: 80 },
+        { date: '2024-12-27', activity: 120 },
+        { date: '2024-12-28', activity: 90 },
+        { date: '2024-12-29', activity: 110 },
+        { date: '2024-12-30', activity: 150 },
+      ]);
+
+      setErrorLogs([
+        {
+          id: '1',
+          timestamp: '2024-12-30T08:15:00Z',
+          provider: 'hubspot',
+          message: 'Authentication failed',
+          solution: 'Check your API key and reconnect your HubSpot account.',
+        },
+        {
+          id: '2',
+          timestamp: '2024-12-29T14:30:00Z',
+          provider: 'salesforce',
+          message: 'API rate limit exceeded',
+          solution: 'Reduce the frequency of API calls or upgrade your plan for higher limits.',
+        },
+        {
+          id: '3',
+          timestamp: '2024-12-28T11:45:00Z',
+          provider: 'hubspot',
+          message: 'Invalid request: Missing required fields',
+          solution: 'Ensure all required fields are included in your API request.',
+        },
+      ]);
+
       setLoading(false);
     }, 1500);
   }, []);
 
+  useEffect(() => {
+    const handleError = (error, errorInfo) => {
+      console.error("Caught an error:", error, errorInfo);
+      setRuntimeError(error);
+    };
+
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
   const handleConnect = async (provider) => {
     setLoading(true);
+    // Simulate OAuth flow
     setTimeout(() => {
       setConnections(prev => prev.map(conn => 
         conn.provider === provider 
@@ -146,6 +209,7 @@ const IntegrationPage = () => {
 
   const handleDisconnect = async (provider) => {
     setLoading(true);
+    // Simulate disconnection
     setTimeout(() => {
       setConnections(prev => prev.map(conn => 
         conn.provider === provider 
@@ -160,52 +224,57 @@ const IntegrationPage = () => {
     setSyncInProgress(true);
     setTimeout(() => {
       setSyncInProgress(false);
-      setSyncLogs(prev => [{
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        provider: 'hubspot',
-        recordsCount: 25,
-        status: 'success',
-        message: 'Manual sync completed',
-        type: 'sync'
-      }, ...prev]);
-      addNotification('Sync completed', 'Successfully synced 25 contacts from HubSpot.');
+      
+      // Simulate a random error (1 in 3 chance)
+      if (Math.random() < 0.33) {
+        const errorMessages = [
+          'Authentication failed',
+          'API rate limit exceeded',
+          'Invalid request',
+          'Network error'
+        ];
+        const randomError = errorMessages[Math.floor(Math.random() * errorMessages.length)];
+        handleError(new Error(randomError), 'hubspot');
+      } else {
+        setSyncLogs(prev => [{
+          id: Date.now().toString(),
+          timestamp: new Date().toISOString(),
+          provider: 'hubspot',
+          recordsCount: 25,
+          status: 'success',
+          message: 'Manual sync completed',
+          type: 'sync'
+        }, ...prev]);
+        addNotification('Sync completed', 'Successfully synced 25 contacts from HubSpot.');
+      }
     }, 2000);
   };
 
-  const handleImport = () => {
-    setSyncInProgress(true);
-    setTimeout(() => {
-      setSyncInProgress(false);
-      setSyncLogs(prev => [{
-        id: Date.now().toString(),
-        timestamp: new Date().toISOString(),
-        provider: 'hubspot',
-        recordsCount: selectedContacts.length,
-        status: 'success',
-        message: `${selectedContacts.length} contacts imported successfully`,
-        type: 'import'
-      }, ...prev]);
-      addNotification('Import completed', `Successfully imported ${selectedContacts.length} contacts.`);
-      setShowImportModal(false);
-    }, 2000);
+  const handleEnrichContacts = async (selectedContacts) => {
+    setLoading(true);
+    // Simulate API call to enrich contacts
+    const enrichedData = await Promise.all(selectedContacts.map(async (contactId) => {
+      const contact = contacts.find(c => c.id === contactId);
+      // Simulate fetching data from social media APIs
+      const enrichedInfo = {
+        linkedinProfile: `https://linkedin.com/in/${contact.name.toLowerCase().replace(' ', '-')}`,
+        twitterHandle: `@${contact.name.toLowerCase().replace(' ', '')}`,
+        profilePicture: `https://api.dicebear.com/6.x/initials/svg?seed=${contact.name}`,
+        jobTitle: 'Software Engineer', // Example job title
+        company: contact.company
+      };
+      return { ...contact, ...enrichedInfo };
+    }));
+    setEnrichedContacts(enrichedData);
+    setLoading(false);
+    setShowEnrichModal(true);
   };
 
-  const handleSaveSettings = () => {
-    setTimeout(() => {
-      addNotification('Settings updated', 'Sync settings have been updated successfully.');
-      setShowSettingsModal(false);
-    }, 1000);
-  };
-
-  const addNotification = (title, message) => {
-    const newNotification = {
-      id: Date.now(),
-      title,
-      message,
-      timestamp: new Date().toISOString(),
-    };
-    setNotifications(prev => [newNotification, ...prev]);
+  const verifyContact = (contactId) => {
+    setContacts(prevContacts => prevContacts.map(contact => 
+      contact.id === contactId ? { ...contact, verified: true } : contact
+    ));
+    addNotification('Contact Verified', `Contact ${contactId} has been verified.`);
   };
 
   const filteredContacts = contacts.filter(contact => {
@@ -213,15 +282,15 @@ const IntegrationPage = () => {
       contact.name.toLowerCase().includes(filters.search.toLowerCase()) ||
       contact.email.toLowerCase().includes(filters.search.toLowerCase()) ||
       contact.company.toLowerCase().includes(filters.search.toLowerCase());
-
+    
     const matchesTags = filters.tags === 'all' || contact.tags.includes(filters.tags);
-
+    
     return matchesSearch && matchesTags;
   });
 
   const ImportModalContent = () => (
     <div className="space-y-6">
-      <div className="flex flex-wrap gap-4">
+      <div className="flex gap-4">
         <Dropdown
           value={filters.dateRange}
           onChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}
@@ -233,7 +302,7 @@ const IntegrationPage = () => {
           ]}
           placeholder="Select Date Range"
         />
-
+        
         <Dropdown
           value={filters.tags}
           onChange={(value) => setFilters(prev => ({ ...prev, tags: value }))}
@@ -255,9 +324,9 @@ const IntegrationPage = () => {
         />
       </div>
 
-      <div className="border rounded-lg overflow-hidden max-h-96 overflow-y-auto">
+      <div className="border rounded-lg overflow-hidden">
         <table className="w-full">
-          <thead className="bg-gray-50 sticky top-0">
+          <thead className="bg-gray-50">
             <tr>
               <th className="px-4 py-3 text-left">
                 <input 
@@ -273,6 +342,7 @@ const IntegrationPage = () => {
               <th className="px-4 py-3 text-left">Email</th>
               <th className="px-4 py-3 text-left">Company</th>
               <th className="px-4 py-3 text-left">Tags</th>
+              <th className="px-4 py-3 text-left">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y">
@@ -302,6 +372,15 @@ const IntegrationPage = () => {
                     </span>
                   ))}
                 </td>
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => verifyContact(contact.id)}
+                    className="px-2 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200 transition-colors"
+                    disabled={contact.verified}
+                  >
+                    {contact.verified ? 'Verified' : 'Verify'}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -320,18 +399,21 @@ const IntegrationPage = () => {
             Cancel
           </button>
           <button
-            onClick={handleImport}
-            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-            disabled={selectedContacts.length === 0 || syncInProgress}
+            onClick={() => handleEnrichContacts(selectedContacts)}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+            disabled={selectedContacts.length === 0}
           >
-            {syncInProgress ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin inline" />
-                Importing...
-              </>
-            ) : (
-              'Import Selected'
-            )}
+            Enrich Selected
+          </button>
+          <button
+            onClick={() => {
+              setShowImportModal(false);
+              // Handle import
+            }}
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+            disabled={selectedContacts.length === 0}
+          >
+            Import Selected
           </button>
         </div>
       </div>
@@ -387,7 +469,7 @@ const IntegrationPage = () => {
         <div className="space-y-2">
           {[
             { value: 'email', label: 'Email' },
-            {value: 'name', label: 'Name' },
+            { value: 'name', label: 'Name' },
             { value: 'company', label: 'Company' },
             { value: 'phone', label: 'Phone' }
           ].map(({ value, label }) => (
@@ -417,7 +499,10 @@ const IntegrationPage = () => {
           Cancel
         </button>
         <button
-          onClick={handleSaveSettings}
+          onClick={() => {
+            setShowSettingsModal(false);
+            // Save settings
+          }}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
         >
           Save Settings
@@ -425,6 +510,145 @@ const IntegrationPage = () => {
       </div>
     </div>
   );
+
+  const EnrichModalContent = () => (
+    <div className="space-y-6">
+      <div className="border rounded-lg overflow-hidden">
+        <table className="w-full">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="px-4 py-3 text-left">Name</th>
+              <th className="px-4 py-3 text-left">Email</th>
+              <th className="px-4 py-3 text-left">Company</th>
+              <th className="px-4 py-3 text-left">LinkedIn</th>
+              <th className="px-4 py-3 text-left">Twitter</th>
+              <th className="px-4 py-3 text-left">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {enrichedContacts.map((contact) => (
+              <tr key={contact.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 flex items-center gap-2">
+                  <img src={contact.profilePicture} alt={contact.name} className="w-8 h-8 rounded-full" />
+                  {contact.name}
+                </td>
+                <td className="px-4 py-3">{contact.email}</td>
+                <td className="px-4 py-3">{contact.company}</td>
+                <td className="px-4 py-3">
+                  <a href={contact.linkedinProfile} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">
+                    Profile
+                  </a>
+                </td>
+                <td className="px-4 py-3">{contact.twitterHandle}</td>
+                <td className="px-4 py-3">
+                  <button
+                    onClick={() => verifyContact(contact.id)}
+                    className="px-2 py-1 bg-green-100 text-green-800 rounded-md hover:bg-green-200"
+                  >
+                    Verify
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <div className="flex justify-end gap-4">
+        <button
+          onClick={() => setShowEnrichModal(false)}
+          className="px-4 py-2 text-gray-600 hover:text-gray-800"
+        >
+          Close
+        </button>
+        <button
+          onClick={() => {
+            setShowEnrichModal(false);
+            // Handle saving enriched data
+            setContacts(prevContacts => {
+              const updatedContacts = prevContacts.map(contact => {
+                const enrichedContact = enrichedContacts.find(ec => ec.id === contact.id);
+                return enrichedContact ? { ...contact, ...enrichedContact } : contact;
+              });
+              return updatedContacts;
+            });
+          }}
+          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+        >
+          Save Enriched Data
+        </button>
+      </div>
+    </div>
+  );
+
+  const addNotification = (title, message) => {
+    //Implementation for adding notification
+    console.log({title, message});
+  }
+
+  const handleError = (error, provider) => {
+    const newError = {
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      provider,
+      message: error.message,
+      solution: getErrorSolution(error.message),
+    };
+    setErrorLogs(prev => [newError, ...prev]);
+    addNotification('Error Occurred', `An error occurred with ${provider}. Check error logs for details.`);
+  };
+
+  const getErrorSolution = (errorMessage) => {
+    const solutions = {
+      'Authentication failed': 'Try reconnecting your account or check if your API key is still valid.',
+      'API rate limit exceeded': 'Wait for a few minutes before trying again or upgrade your plan for higher limits.',
+      'Invalid request': 'Check your request parameters and try again.',
+      'Network error': 'Check your internet connection and try again.',
+    };
+    return solutions[errorMessage] || 'Contact support for assistance with this error.';
+  };
+
+  const generateSummaryReport = () => {
+    const report = [
+      ['Date', 'Provider', 'Error', 'Solution'],
+      ...errorLogs.map(log => [
+        new Date(log.timestamp).toLocaleDateString(),
+        log.provider,
+        log.message,
+        log.solution
+      ])
+    ];
+    setSummaryReport(report);
+  };
+
+  const downloadPDFReport = () => {
+    // This is a placeholder for PDF generation
+    // In a real-world scenario, you'd use a library like jsPDF to generate the PDF
+    const pdfContent = syncLogs.map(log => 
+      `${new Date(log.timestamp).toLocaleString()} - ${log.provider} - ${log.type} - ${log.recordsCount} records`
+    ).join('\n');
+    
+    const blob = new Blob([pdfContent], { type: 'text/plain;charset=utf-8' });
+    saveAs(blob, 'sync_summary_report.txt');
+  };
+
+  if (runtimeError) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-red-50 p-4">
+        <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+        <h1 className="text-2xl font-bold text-red-700 mb-2">Oops! Something went wrong.</h1>
+        <p className="text-red-600 mb-4">We're sorry, but an error occurred while rendering the page.</p>
+        <pre className="bg-white p-4 rounded-lg shadow-inner text-red-500 overflow-auto max-w-full">
+          {runtimeError.toString()}
+        </pre>
+        <button
+          onClick={() => window.location.reload()}
+          className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors"
+        >
+          Reload Page
+        </button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -436,29 +660,24 @@ const IntegrationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header section */}
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">CRM Integrations</h1>
             <p className="text-gray-500 mt-1">Manage your CRM connections and synchronization</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <Bell className="w-6 h-6 text-gray-500 cursor-pointer" />
-              {notifications.length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-                  {notifications.length}
-                </span>
-              )}
-            </div>
-          </div>
+          <button 
+            onClick={() => setShowSettingsModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            <Settings className="w-4 h-4" />
+            Integration Settings
+          </button>
         </div>
 
-        {/* Help Banner */}
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 md:p-6 flex items-start gap-3">
-          <HelpCircle className="w-6 h-6 text-blue-500 mt-0.5 flex-shrink-0" />
+        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6 flex items-start gap-3">
+          <HelpCircle className="w-6 h-6 text-blue-500 mt-0.5" />
           <div>
             <h3 className="font-medium text-blue-800 text-lg">Need Help?</h3>
             <p className="text-blue-600 mt-1">
@@ -467,8 +686,7 @@ const IntegrationPage = () => {
           </div>
         </div>
 
-        {/* CRM Connections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {connections.map(connection => (
             <div key={connection.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start">
@@ -577,71 +795,160 @@ const IntegrationPage = () => {
           ))}
         </div>
 
-        {/* Sync Activity */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-            <h2 className="text-xl font-semibold">Sync Activity</h2>
-            <div className="flex items-center gap-4">
-              <Dropdown
-                value="all"
-                onChange={() => {}}
-                options={[
-                  { value: 'all', label: 'All Providers' },
-                  { value: 'hubspot', label: 'HubSpot' },
-                  { value: 'salesforce', label: 'Salesforce' }
-                ]}
-                placeholder="Select Provider"
-              />
-              <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700">
-                <Info className="w-4 h-4" />
-                View All Logs
-              </button>
-            </div>
+        <div className="bg-white rounded-lg shadow-smp-6">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold">Integration Details</h2>
           </div>
-
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Timestamp</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Provider</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Type</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Records</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
-                  <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Message</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-200">
-                {syncLogs.map(log => (
-                  <tr key={log.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm">
-                      {new Date(log.timestamp).toLocaleString()}
-                    </td>
-                    <td className="px-4 py-3 text-sm capitalize">{log.provider}</td>
-                    <td className="px-4 py-3 text-sm capitalize">{log.type}</td>
-                    <td className="px-4 py-3 text-sm">{log.recordsCount}</td>
-                    <td className="px-4 py-3 text-sm">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                        log.status === 'success' ? 'bg-green-100 text-green-800' : 
-                        'bg-red-100 text-red-800'
-                      }`}>
-                        {log.status === 'success' ? 
-                          <Check className="w-3 h-3 mr-1" /> : 
-                          <X className="w-3 h-3 mr-1" />
-                        }
-                        {log.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm">{log.message}</td>
-                  </tr>
+          <div className="border-b">
+            <nav className="-mb-px flex" aria-label="Tabs">
+              {['Sync Logs', 'CRM Activity Dashboard', 'Error Logs'].map((tab, index) => (
+                <button
+                  key={tab}
+                  className={`whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm ${
+                    index === activeTab
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                  onClick={() => setActiveTab(index)}
+                >
+                  {tab}
+                </button>
+              ))}
+            </nav>
+          </div>
+          <div className="mt-6">
+            {activeTab === 0 && (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Timestamp</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Provider</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Type</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Records</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Status</th>
+                      <th className="px-4 py-3 text-left text-sm font-medium text-gray-500">Message</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {syncLogs.map(log => (
+                      <tr key={log.id} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm">
+                          {new Date(log.timestamp).toLocaleString()}
+                        </td>
+                        <td className="px-4 py-3 text-sm capitalize">{log.provider}</td>
+                        <td className="px-4 py-3 text-sm capitalize">{log.type}</td>
+                        <td className="px-4 py-3 text-sm">{log.recordsCount}</td>
+                        <td className="px-4 py-3 text-sm">
+                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                            log.status === 'success' ? 'bg-green-100 text-green-800' : 
+                            'bg-red-100 text-red-800'
+                          }`}>
+                            {log.status === 'success' ? 
+                              <Check className="w-3 h-3 mr-1" /> : 
+                              <X className="w-3 h-3 mr-1" />
+                            }
+                            {log.status}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3 text-sm">{log.message}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+            {activeTab === 1 && (
+              <div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  <div className="bg-blue-50 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <UserPlus className="w-8 h-8 text-blue-500" />
+                      <span className="text-2xl font-bold text-blue-700">{crmActivity.contactsImported}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-blue-600">Contacts Imported</p>
+                  </div>
+                  <div className="bg-green-50 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <Users className="w-8 h-8 text-green-500" />
+                      <span className="text-2xl font-bold text-green-700">{crmActivity.contactsExported}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-green-600">Contacts Exported</p>
+                  </div>
+                  <div className="bg-yellow-50 p-4 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <FileText className="w-8 h-8 text-yellow-500" />
+                      <span className="text-2xl font-bold text-yellow-700">{crmActivity.detailsChanged}</span>
+                    </div>
+                    <p className="mt-2 text-sm text-yellow-600">Details Changed</p>
+                  </div>
+                </div>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={activityChartData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="activity" stroke="#3b82f6" />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+            {activeTab === 2 && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-semibold">Error Logs</h3>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={generateSummaryReport}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      Generate Report
+                    </button>
+                    {summaryReport.length > 0 && (
+                      <>
+                        <CSVLink
+                          data={summaryReport}
+                          filename="error_summary_report.csv"
+                          className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
+                        >
+                          Download CSV
+                        </CSVLink>
+                        <button
+                          onClick={downloadPDFReport}
+                          className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors"
+                        >
+                          Download PDF
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {errorLogs.map((error) => (
+                  <div key={error.id} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div className="flex items-start">
+                      <AlertCircle className="w-5 h-5 text-red-500 mt-0.5 mr-3" />
+                      <div>
+                        <h4 className="font-medium text-red-800">{error.provider} Error</h4>
+                        <p className="text-sm text-red-700 mt-1">{error.message}</p>
+                        <p className="text-sm text-red-600 mt-2">
+                          <strong>Solution:</strong> {error.solution}
+                        </p>
+                        <p className="text-xs text-red-500 mt-1">
+                          {new Date(error.timestamp).toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Modals */}
       <Modal
         isOpen={showImportModal}
         onClose={() => setShowImportModal(false)}
@@ -658,31 +965,16 @@ const IntegrationPage = () => {
         <SettingsModalContent />
       </Modal>
 
-      {/* Notification Panel */}
-      {notifications.length > 0 && (
-        <div className="fixed bottom-4 right-4 max-w-md w-full bg-white rounded-lg shadow-lg p-4 space-y-2">
-          {notifications.map((notification) => (
-            <div 
-              key={notification.id} 
-              className={`flex items-center gap-2 p-2 rounded ${
-                notification.title.toLowerCase().includes('success') ? 'bg-green-100' : 'bg-blue-100'
-              }`}
-            >
-              {notification.title.toLowerCase().includes('success') ? (
-                <Check className="w-4 h-4 text-green-500" />
-              ) : (
-                <Info className="w-4 h-4 text-blue-500" />
-              )}
-              <div>
-                <p className="font-medium text-sm">{notification.title}</p>
-                <p className="text-xs">{notification.message}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      <Modal
+        isOpen={showEnrichModal}
+        onClose={() => setShowEnrichModal(false)}
+        title="Enriched Contacts"
+      >
+        <EnrichModalContent />
+      </Modal>
     </div>
   );
 };
 
 export default IntegrationPage;
+

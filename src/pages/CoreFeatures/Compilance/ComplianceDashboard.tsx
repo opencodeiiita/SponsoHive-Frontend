@@ -2,6 +2,31 @@ import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import SenderAuthDashboard from './SenderAuthDashboard';
 
+const Button = ({ children, onClick, className = '' }) => (
+  <button
+    className={`px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 ${className}`}
+    onClick={onClick}
+  >
+    {children}
+  </button>
+);
+
+const Select = ({ value, onChange, options, placeholder }) => (
+  <select
+    value={value}
+    onChange={(e) => onChange(e.target.value)}
+    className="w-full px-3 py-2 border rounded-lg"
+  >
+    <option value="" disabled>{placeholder}</option>
+    {options.map((option) => (
+      <option key={option.value} value={option.value}>
+        {option.label}
+      </option>
+    ))}
+  </select>
+);
+
+
 interface OptOutEntry {
   id: string;
   email: string;
@@ -42,12 +67,25 @@ const ComplianceDashboard = () => {
   const [selectedCampaign, setSelectedCampaign] = useState('all');
   const [activeTab, setActiveTab] = useState('dashboard');
 
+  const [languageDetectionContent, setLanguageDetectionContent] = useState('');
+  const [detectedLanguage, setDetectedLanguage] = useState('');
+  const [complianceIssues, setComplianceIssues] = useState<string[]>([]);
+
+  const [legalFooterCountry, setLegalFooterCountry] = useState('');
+  const [optOutText, setOptOutText] = useState('');
+  const [senderDetails, setSenderDetails] = useState('');
+
+  const [previewRegion, setPreviewRegion] = useState('');
+  const [emailContent, setEmailContent] = useState('');
+  const [previewContent, setPreviewContent] = useState('');
+
   const tabs = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'suppression', label: 'Suppression List' },
     { id: 'audit', label: 'Audit Trail' },
     { id: 'settings', label: 'Compliance Settings' },
     { id: 'senderAuth', label: 'Sender Authentication' },
+    { id: 'multiLanguage', label: 'Multi-Language Compliance' },
   ];
 
   // Mock data loading
@@ -74,6 +112,18 @@ const ComplianceDashboard = () => {
       });
       setLoading(false);
     }, 1500);
+  }, []);
+
+  useEffect(() => {
+    const updateInterval = setInterval(() => {
+      console.log('Checking for compliance rule updates...');
+      if (Math.random() > 0.8) {
+        console.log('New compliance rule update available!');
+        // Here you would typically fetch and apply the new rules
+      }
+    }, 300000); // Check every 5 minutes
+
+    return () => clearInterval(updateInterval);
   }, []);
 
   const renderSuppressionList = () => (
@@ -107,7 +157,6 @@ const ComplianceDashboard = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {/* Sample suppression list entries */}
             {[1, 2, 3].map((_, index) => (
               <tr key={index} className="hover:bg-gray-50">
                 <td className="px-4 py-3 text-sm">user{index}@example.com</td>
@@ -172,6 +221,109 @@ const ComplianceDashboard = () => {
             </div>
           </div>
         ))}
+      </div>
+    </div>
+  );
+
+  const renderMultiLanguageCompliance = () => (
+    <div className="bg-white rounded-lg shadow-sm p-6 space-y-8">
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Language Detection & Compliance Check</h3>
+        <textarea
+          value={languageDetectionContent}
+          onChange={(e) => setLanguageDetectionContent(e.target.value)}
+          placeholder="Enter your email content here..."
+          className="w-full px-3 py-2 border rounded-lg min-h-[200px]"
+        />
+        <Button onClick={() => {
+          setDetectedLanguage('English');
+          setComplianceIssues(['Use of sensitive personal data without explicit consent', 'Missing opt-out link']);
+        }}>
+          Detect Language & Check Compliance
+        </Button>
+        {detectedLanguage && (
+          <div>
+            <p>Detected Language: {detectedLanguage}</p>
+            <h4 className="font-semibold mt-2">Compliance Issues:</h4>
+            <ul className="list-disc pl-5">
+              {complianceIssues.map((issue, index) => (
+                <li key={index} className="text-red-600">{issue}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Legal Footer Customizer</h3>
+        <Select
+          value={legalFooterCountry}
+          onChange={setLegalFooterCountry}
+          options={[
+            { value: "in", label: "India" },
+            { value: "us", label: "United States" },
+            { value: "uk", label: "United Kingdom" },
+            { value: "eu", label: "European Union" },
+          ]}
+          placeholder="Select country"
+        />
+        <textarea
+          value={optOutText}
+          onChange={(e) => setOptOutText(e.target.value)}
+          placeholder="Enter opt-out text..."
+          className="w-full px-3 py-2 border rounded-lg"
+        />
+        <input
+          type="text"
+          value={senderDetails}
+          onChange={(e) => setSenderDetails(e.target.value)}
+          placeholder="Enter sender details..."
+          className="w-full px-3 py-2 border rounded-lg"
+        />
+        <Button onClick={() => console.log('Saving footer:', { legalFooterCountry, optOutText, senderDetails })}>
+          Save Footer
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Compliance Preview Tool</h3>
+        <Select
+          value={previewRegion}
+          onChange={setPreviewRegion}
+          options={[
+            { value: "in", label: "India" },
+            { value: "us", label: "United States" },
+            { value: "eu", label: "European Union" },
+            { value: "uk", label: "United Kingdom" },
+          ]}
+          placeholder="Select region"
+        />
+        <textarea
+          value={emailContent}
+          onChange={(e) => setEmailContent(e.target.value)}
+          placeholder="Enter email content..."
+          className="w-full px-3 py-2 border rounded-lg min-h-[200px]"
+        />
+        <Button onClick={() => {
+          const preview = `
+            ${emailContent}
+            
+            -----
+            [COMPLIANCE PREVIEW FOR ${previewRegion.toUpperCase()}]
+            - Opt-out link present: YES
+            - Sender information included: YES
+            - Use of personal data disclosed: NO (VIOLATION)
+            -----
+          `;
+          setPreviewContent(preview);
+        }}>
+          Generate Preview
+        </Button>
+        {previewContent && (
+          <div className="mt-4 p-4 bg-gray-100 rounded-md">
+            <pre className="whitespace-pre-wrap">{previewContent}</pre>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -455,14 +607,13 @@ const ComplianceDashboard = () => {
 
               {/* Save Button */}
               <div className="mt-6 flex justify-end">
-                <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-                  Save Settings
-                </button>
+                <Button>Save Settings</Button>
               </div>
             </div>
           </div>
         )}
         {activeTab === 'senderAuth' && renderSenderAuthDashboard()}
+        {activeTab === 'multiLanguage' && renderMultiLanguageCompliance()}
       </div>
     </div>
   );
