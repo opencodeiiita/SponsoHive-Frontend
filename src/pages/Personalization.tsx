@@ -39,17 +39,33 @@ const Personalization: React.FC = () => {
     "image/png": [".png"],
   };
 
+  const generatePreviewContent = (content: string): string => {
+    let preview = content.trim();
+  
+    // Replace valid placeholders with default values
+    placeholderOptions.forEach((placeholder) => {
+      const regex = new RegExp(`(?<!{){${placeholder.key}}(?!})`, "g");
+      preview = preview.replace(
+        regex,
+        placeholder.defaultValue || `{${placeholder.key}}`
+      );
+    });
+  
+    // Return the updated preview content
+    return preview;
+  };
+
   const handleEditorChange = (value: string) => {
     setEmailContent(value);
-
+  
     const editor = quillRef.current?.getEditor();
     if (!editor) return;
-
+  
     const selection = editor.getSelection();
     if (selection) {
       const cursorIndex = selection.index;
       const textBeforeCursor = editor.getText(0, cursorIndex);
-
+  
       if (textBeforeCursor.endsWith("{")) {
         const bounds = editor.getBounds(cursorIndex);
         setAutocompletePosition({ top: bounds.top + 20, left: bounds.left });
@@ -58,7 +74,84 @@ const Personalization: React.FC = () => {
         setShowAutocomplete(false);
       }
     }
+  
+    // Real-time preview update
+    const preview = generatePreviewContent(value);
+    setPreviewContent(preview);
+  
+    // Real-time error validation
+    validateContent(value);
   };
+  
+  const validateContent = (content: string) => {
+    let errors: string[] = [];
+    let trimmedContent = content.trim();
+  
+    // Check for empty content
+    if (!trimmedContent) {
+      errors.push("The email content cannot be empty.");
+    }
+  
+    // Replace valid placeholders with default values
+    placeholderOptions.forEach((placeholder) => {
+      const regex = new RegExp(`(?<!{){${placeholder.key}}(?!})`, "g");
+      trimmedContent = trimmedContent.replace(
+        regex,
+        placeholder.defaultValue || `{${placeholder.key}}`
+      );
+    });
+  
+    // Detect invalid placeholders
+    const remainingPlaceholders = trimmedContent.match(/{(.*?)}/g);
+    if (remainingPlaceholders) {
+      const invalidPlaceholders = remainingPlaceholders.filter((placeholder) => {
+        const content = placeholder.slice(1, -1); // Remove `{` and `}`
+        return !placeholderOptions.some((p) => p.key === content);
+      });
+  
+      if (invalidPlaceholders.length > 0) {
+        errors.push(
+          `Invalid placeholders detected: ${invalidPlaceholders.join(", ")}`
+        );
+      }
+    }
+  
+    // Check for unused placeholders
+    const unusedPlaceholders = placeholderOptions.filter((placeholder) => {
+      const regex = new RegExp(`(?<!{){${placeholder.key}}(?!})`, "g");
+      return !content.match(regex);
+    });
+    if (unusedPlaceholders.length > 0) {
+      errors.push(
+        `Unused placeholders: ${unusedPlaceholders
+          .map((p) => `{${p.key}}`)
+          .join(", ")}`
+      );
+    }
+  
+    // Detect repeated placeholders
+    const placeholderCounts: Record<string, number> = {};
+    placeholderOptions.forEach((placeholder) => {
+      const regex = new RegExp(`(?<!{){${placeholder.key}}(?!})`, "g");
+      const matchCount = (content.match(regex) || []).length;
+      if (matchCount > 1) {
+        placeholderCounts[placeholder.key] = matchCount;
+      }
+    });
+  
+    if (Object.keys(placeholderCounts).length > 0) {
+      const repeated = Object.entries(placeholderCounts)
+        .map(([key, count]) => `{${key}} (used ${count} times)`)
+        .join(", ");
+      errors.push(`Repeated placeholders: ${repeated}`);
+    }
+  
+    // Update error states
+    setValidationError(errors.length > 0 ? errors.join("\n") : null);
+    setErrorMessages(errors);
+  };
+  
+  
 
   const insertPlaceholder = (placeholderKey: string) => {
     const editor = quillRef.current?.getEditor();
@@ -73,16 +166,15 @@ const Personalization: React.FC = () => {
 
     setShowAutocomplete(false);
   };
-
   const generatePreview = () => {
     let preview = emailContent.trim();
     let errors: string[] = [];
-
+  
     // Check for empty content
     if (!preview) {
       errors.push("The email content cannot be empty.");
     }
-
+  
     // Replace valid placeholders with default values
     placeholderOptions.forEach((placeholder) => {
       const regex = new RegExp(`(?<!{){${placeholder.key}}(?!})`, "g");
@@ -91,7 +183,7 @@ const Personalization: React.FC = () => {
         placeholder.defaultValue || `{${placeholder.key}}`
       );
     });
-
+  
     // Detect invalid placeholders
     const remainingPlaceholders = preview.match(/{(.*?)}/g);
     if (remainingPlaceholders) {
@@ -99,14 +191,14 @@ const Personalization: React.FC = () => {
         const content = placeholder.slice(1, -1); // Remove `{` and `}`
         return !placeholderOptions.some((p) => p.key === content);
       });
-
+  
       if (invalidPlaceholders.length > 0) {
         errors.push(
-          `The following placeholders are invalid : ${invalidPlaceholders.join(", ")}`
+          `The following placeholders are invalid: ${invalidPlaceholders.join(", ")}`
         );
       }
     }
-
+  
     // Check for unused placeholders
     const unusedPlaceholders = placeholderOptions.filter((placeholder) => {
       const regex = new RegExp(`(?<!{){${placeholder.key}}(?!})`, "g");
@@ -119,8 +211,8 @@ const Personalization: React.FC = () => {
           .join(", ")}`
       );
     }
-
-    // Detect repeated placeholders 
+  
+    // Detect repeated placeholders
     const placeholderCounts: Record<string, number> = {};
     placeholderOptions.forEach((placeholder) => {
       const regex = new RegExp(`(?<!{){${placeholder.key}}(?!})`, "g");
@@ -129,19 +221,22 @@ const Personalization: React.FC = () => {
         placeholderCounts[placeholder.key] = matchCount;
       }
     });
-
+  
     if (Object.keys(placeholderCounts).length > 0) {
       const repeated = Object.entries(placeholderCounts)
         .map(([key, count]) => `{${key}} (used ${count} times)`)
         .join(", ");
       errors.push(`Repeated placeholders: ${repeated}`);
     }
-
+  
+    // Update the preview content
+    setPreviewContent(preview);
+  
     // Set validation errors if any
     setValidationError(errors.length > 0 ? errors.join("\n") : null);
     setErrorMessages(errors);
-    setPreviewContent(preview);
   };
+  
 
   const compressFile = async (file: File): Promise<File> => {
     if (file.size < COMPRESSION_THRESHOLD) {
@@ -272,23 +367,22 @@ const Personalization: React.FC = () => {
             </div>
           </div>
         </div>
-
         <div className="flex-1 min-w-[45%] bg-yellow-600 p-6 rounded shadow-lg">
-          <h2 className="text-2xl font-semibold mb-4 text-black">Email Preview</h2>
-          {validationError && (
-            <div className="bg-red-100 text-red-700 p-4 rounded shadow mb-4">
-              {validationError.split("\n").map((error, index) => (
-                <p key={index}>{error}</p>
-              ))}
-            </div>
-          )}
-          <div className="bg-yellow-50 text-black p-4 rounded shadow">
-            <div
-              dangerouslySetInnerHTML={{ __html: previewContent }}
-              className="whitespace-pre-wrap"
-            ></div>
-          </div>
-        </div>
+  <h2 className="text-2xl font-semibold mb-4 text-black">Email Preview</h2>
+  {validationError && (
+    <div className="bg-red-100 text-red-700 p-4 rounded shadow mb-4">
+      {validationError.split("\n").map((error, index) => (
+        <p key={index}>{error}</p>
+      ))}
+    </div>
+  )}
+  <div className="bg-yellow-50 text-black p-4 rounded shadow">
+    <div
+      dangerouslySetInnerHTML={{ __html: previewContent }}
+      className="whitespace-pre-wrap"
+    ></div>
+  </div>
+</div>
       </div>
 
       {/* Attachment Module */}
